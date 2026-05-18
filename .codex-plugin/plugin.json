@@ -1,0 +1,35 @@
+{
+  "name": "docjacket",
+  "displayName": "DocJacket — TC Operating System",
+  "version": "0.2.0",
+  "publisher": "DocJacket",
+  "description": "Connect your DocJacket transactions, tasks, deadlines, and Prepared Work to Codex. Triage your pipeline in one prompt.",
+  "homepage": "https://docjacket.com/ai-access",
+  "documentation": "https://docs.docjacket.com/ai-access/codex",
+  "support": "support@docjacket.com",
+  "license": "MIT",
+  "categories": [
+    "productivity",
+    "real-estate",
+    "transaction-management"
+  ],
+  "icon": "../assets/logo-mark-32.png",
+  "assets": {
+    "logo": "../assets/logo-512.png",
+    "screenshots": [
+      "../assets/screenshot-triage.png"
+    ]
+  },
+  "skills": [
+    "../skills/daily-triage"
+  ],
+  "mcp": "../.mcp.json",
+  "app": "../.app.json",
+  "starterPrompts": [
+    "Use DocJacket to summarize my active transactions.",
+    "Use DocJacket to find transactions that need attention today.",
+    "Use DocJacket to list deadlines this week.",
+    "Use DocJacket to show open tasks on the [property] deal.",
+    "Use DocJacket to look up the listing agent on [property]."
+  ]
+}

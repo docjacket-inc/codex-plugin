@@ -1,0 +1,16 @@
+{
+  "servers": {
+    "docjacket": {
+      "url": "https://mcp.docjacket.com/mcp",
+      "transport": "http",
+      "auth": {
+        "type": "bearer",
+        "tokenHelp": "Mint a token at https://app.docjacket.com/settings/ai-access (Owner or Admin role required). Label it 'Codex Plugin' for per-surface revocation."
+      },
+      "headers": {
+        "X-DocJacket-Source-App": "codex",
+        "X-DocJacket-Plugin-Version": "0.2.0"
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schemas.openai.com/codex/plugin-marketplace.v1.json",
+  "name": "docjacket",
+  "displayName": "DocJacket — TC Operating System",
+  "description": "Connect DocJacket transactions, key dates, tasks, contacts, and document checklists to Codex.",
+  "publisher": "DocJacket",
+  "homepage": "https://docjacket.com/ai-access",
+  "documentation": "https://docs.docjacket.com/ai-access/codex",
+  "plugins": [
+    {
+      "name": "docjacket",
+      "source": {
+        "source": "git-subdir",
+        "path": "."
+      },
+      "interface": {
+        "displayName": "DocJacket",
+        "description": "10 read tools for DocJacket transactions plus the Daily Triage skill — pre-ranked overdue-first triage in one tool call."
+      }
+    }
+  ]
+}

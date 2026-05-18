@@ -1,0 +1,12 @@
+{
+  "name": "docjacket",
+  "version": "0.2.0",
+  "description": "Transaction Coordination operating system — works with ChatGPT and Claude.",
+  "commands": [
+    {
+      "name": "daily-triage",
+      "description": "Find every transaction that needs attention today, grouped by urgency.",
+      "skill": "../skills/daily-triage"
+    }
+  ]
+}
