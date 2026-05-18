@@ -4,8 +4,8 @@
   "displayName": "DocJacket — TC Operating System",
   "description": "Connect DocJacket transactions, key dates, tasks, contacts, and document checklists to Codex.",
   "publisher": "DocJacket",
-  "homepage": "https://docjacket.com/ai-access",
-  "documentation": "https://docs.docjacket.com/ai-access/codex",
+  "homepage": "https://docjacket.com/mcp",
+  "documentation": "https://docs.docjacket.com/mcp/codex",
   "plugins": [
     {
       "name": "docjacket",

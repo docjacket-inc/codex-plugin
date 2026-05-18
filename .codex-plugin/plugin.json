@@ -4,8 +4,8 @@
   "version": "0.2.0",
   "publisher": "DocJacket",
   "description": "Connect your DocJacket transactions, tasks, deadlines, and Prepared Work to Codex. Triage your pipeline in one prompt.",
-  "homepage": "https://docjacket.com/ai-access",
-  "documentation": "https://docs.docjacket.com/ai-access/codex",
+  "homepage": "https://docjacket.com/mcp",
+  "documentation": "https://docs.docjacket.com/mcp/codex",
   "support": "support@docjacket.com",
   "license": "MIT",
   "categories": [

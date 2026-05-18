@@ -72,6 +72,6 @@ Read-only. See [`DISCLAIMER.md`](DISCLAIMER.md) for the full scope and limitatio
 
 ## Support
 
-- Docs: <https://docs.docjacket.com/ai-access/codex>
+- Docs: <https://docs.docjacket.com/mcp/codex>
 - Issues: <https://github.com/DocJacket-LLC/codex-plugin/issues>
 - Email: support@docjacket.com
