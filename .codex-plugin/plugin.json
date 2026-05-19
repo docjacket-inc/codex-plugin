@@ -1,11 +1,11 @@
 {
   "name": "docjacket",
   "displayName": "DocJacket — TC Operating System",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "DocJacket",
-  "description": "Connect your DocJacket transactions, tasks, deadlines, and Prepared Work to Codex. Triage your pipeline in one prompt.",
-  "homepage": "https://docjacket.com/mcp",
-  "documentation": "https://docs.docjacket.com/mcp/codex",
+  "description": "Connect your DocJacket transactions, tasks, deadlines, and Prepared Work to Codex. Triage your pipeline in one prompt. Paste-URL-and-go install via OAuth 2.1 + DCR.",
+  "homepage": "https://www.docjacket.com/mcp",
+  "documentation": "https://help.docjacket.com/docs/mcp/codex",
   "support": "support@docjacket.com",
   "license": "MIT",
   "categories": [

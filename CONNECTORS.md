@@ -1,6 +1,6 @@
 # Optional connectors that pair well with DocJacket
 
-The DocJacket plugin works **standalone** — paste in your bearer token and the 10 read tools work. But several Claude connectors compose with DocJacket to unlock richer workflows. None of these are required.
+The DocJacket plugin works **standalone** — paste the server URL, click Allow on the OAuth consent screen, and the 10 read tools work. But several connectors compose with DocJacket to unlock richer workflows. None of these are required.
 
 | Connector | What it unlocks for DocJacket | How |
 |---|---|---|
