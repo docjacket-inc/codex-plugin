@@ -16,10 +16,12 @@ tools_used:
   - send_email_to_agent
   - create_tasks
   - update_key_date
+  - add_key_dates_batch
+  - create_reminder
   - save_status_summary
 expected_output: A status (sent / created / updated / saved) plus a one-line summary of what was done. The user sees the result on the transaction's activity feed.
 required_scopes: [draft]
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Execution workflow
@@ -55,16 +57,20 @@ Show the `summary` to the user inline. The action is already done — no review 
 | "Email the listing agent about [topic]" (or any agent-to-agent on a specific topic) | `send_agent_followup` |
 | "Draft an email to the [agent] covering these talking points" | `send_email_to_agent` |
 | "Update / extend / move the [key date] to [new date]" | `update_key_date` |
+| "Add several key dates to this transaction" (intake or post-amendment) | `add_key_dates_batch` |
 | "Add a task to follow up on X" or "remind me to Y by Z" | `create_tasks` |
+| "Set a reminder for [X days] before [deadline]" or "nudge the agent before EMD" | `create_reminder` |
 | "Summarize this transaction for me" or "save a status recap on the deal" | `save_status_summary` |
 
-Three calls to keep close:
+Four calls to keep close:
 
 1. **Client update vs agent follow-up.** `send_client_update` is for buyer / seller communications — the recipient is the customer's client. `send_agent_followup` is for the network — listing agent, buyer agent, lender, title rep, referral source. Different tone, different liability, different default recipients.
 
 2. **Document request vs agent follow-up.** If the email's primary purpose is *"please send me X"*, use `send_document_request` (it captures `documentTypes`, which feeds document tracking). Anything else agent-to-agent → `send_agent_followup`.
 
-3. **Create tasks vs update key date.** "Follow up with the lender on Friday" → `create_tasks`. "Move the financing deadline to Friday" → `update_key_date`. The first creates work; the second moves a contractual milestone (cascades to scheduled reminders + FUB sync).
+3. **Create tasks vs update key date vs create reminder.** "Follow up with the lender on Friday" → `create_tasks` (manual todo for the TC). "Move the financing deadline to Friday" → `update_key_date` (moves the contractual milestone; cascades). "Nudge the lender 2 days before financing deadline" → `create_reminder` (durable Hangfire job; fires server-side even when the chat is closed).
+
+4. **`update_key_date` vs `add_key_dates_batch`.** Single-row date moves (TC amends one deadline) → `update_key_date`. Bulk seeding (intake just produced 5-7 timeline dates that all need to land) → `add_key_dates_batch` — one transactional call instead of N round trips, with per-row failure reporting so the LLM can retry just the misses.
 
 ## Confirm before you call
 
@@ -108,6 +114,52 @@ Before composing, gather what you need. The customer's mail-MCP (Gmail / Outlook
      subject, bodyHtml, bodyPlainText
    })
 ```
+
+### Recipe — schedule a durable reminder
+
+```
+User: "Remind the buyer's agent 2 days before EMD is due."
+
+1. get_key_dates({ transactionId })          — find the EMD key date (or get it from the user)
+2. get_contacts({ transactionId })           — confirm the buyer's agent is on the deal
+3. (confirm timing + recipient with user)
+4. create_reminder({
+     transactionId,
+     deadlineType: "EarnestMoneyDue",
+     deadlineDate: "2026-05-22",
+     daysBeforeReminder: 2,
+     remindWho: "party",
+     partyRole: "buyer_agent",
+     channel: "email"
+   })
+```
+
+The reminder fires via DocJacket's Hangfire scheduler. It sends whether the chat is open or not — the TC sets it and forgets it. If the same `(deadlineType, daysBeforeReminder)` pair already has a reminder, the call returns `DUPLICATE_REMINDER` (idempotent).
+
+For conditional "only nudge if they haven't already responded" logic, that's a Cowork Scheduled Task or Codex Automation that wraps `create_reminder` + a Gmail thread check — out of scope for the deterministic-server-side reminder.
+
+### Recipe — batch-add timeline key dates (post-extraction or post-amendment)
+
+```
+User: "Add EMD May 22, inspection May 29, appraisal June 5, financing June 13, walkthrough June 19."
+
+1. (paraphrase back for confirmation)
+2. add_key_dates_batch({
+     transactionId,
+     keyDates: [
+       { keyDateType: "EarnestMoneyDue",     dateValue: "2026-05-22" },
+       { keyDateType: "InspectionDeadline",  dateValue: "2026-05-29" },
+       { keyDateType: "AppraisalDeadline",   dateValue: "2026-06-05" },
+       { keyDateType: "FinancingDeadline",   dateValue: "2026-06-13" },
+       { keyDateType: "FinalWalkthrough",    dateValue: "2026-06-19" }
+     ]
+   })
+   → { created: 5, failed: [] }
+```
+
+Up to 50 entries per batch. Per-row failures (unknown `keyDateType`, invalid date) come back in the `failed` array — surface them: *"Added 4 of 5. The fifth ('survey_deadline') isn't a recognized type — want me to add it as a custom date instead?"*
+
+For intake-time bulk seeding, prefer this over a loop of `update_key_date` calls — one DB transaction, one round trip, per-row failures don't abort the batch.
 
 ### Recipe — follow up on a prior email thread
 

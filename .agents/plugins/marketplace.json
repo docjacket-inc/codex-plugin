@@ -2,7 +2,7 @@
   "$schema": "https://schemas.openai.com/codex/plugin-marketplace.v1.json",
   "name": "docjacket",
   "displayName": "DocJacket — TC Operating System",
-  "description": "Connect DocJacket transactions, key dates, tasks, contacts, and document checklists to Codex. v0.6 adds inbox-workflow skills — match Gmail emails to active deals, classify attachments, run morning briefings, prep for closings, send follow-ups from your connected mailbox.",
+  "description": "Connect your DocJacket transactions, tasks, deadlines, contacts, and contingencies to Codex. v0.6 adds the inbox-workflow skill set — match Gmail emails against active deals, classify attachments, run morning briefings, prep for closings, and send follow-ups directly from your connected mailbox. The chat is the approval gate — you confirm in conversation, DocJacket executes immediately. Paste-URL-and-go install via OAuth 2.1 + DCR. Call `mcp_catalog` after install for the live tool inventory.",
   "publisher": "DocJacket",
   "homepage": "https://docjacket.com/mcp",
   "documentation": "https://docs.docjacket.com/mcp/codex",
