@@ -1,6 +1,6 @@
 {
   "name": "docjacket",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Transaction Coordination operating system — works with ChatGPT and Claude.",
   "commands": [
     {

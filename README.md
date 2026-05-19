@@ -5,7 +5,7 @@
 # DocJacket — Transaction Coordination plugin for Codex
 
 [![Plugin](https://img.shields.io/badge/Codex-plugin-purple)]()
-[![Version](https://img.shields.io/badge/version-0.2.0-green)]()
+[![Version](https://img.shields.io/badge/version-0.3.0-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
 Connect DocJacket transactions, tasks, deadlines, contacts, and document checklists to OpenAI Codex. Triage your pipeline, brief on any active deal, and check missing documents — all from inside Codex.
@@ -17,7 +17,7 @@ Connect DocJacket transactions, tasks, deadlines, contacts, and document checkli
 - **10 read tools** exposed via the DocJacket MCP server at `https://mcp.docjacket.com/mcp`
 - **Daily Triage** skill — `$docjacket-daily-triage` returns every transaction needing attention, pre-ranked
 
-Read-only. No writes, no autonomous actions. Drafting tools (`prepare_*` / `propose_*`) ship in **v0.3** once the upstream MCP server reaches Phase 8.
+Read-only. No writes, no autonomous actions. Drafting tools (`prepare_*` / `propose_*`) ship in **v0.4** once the upstream MCP server reaches Phase 8.
 
 ## Tool catalog
 
@@ -25,20 +25,30 @@ Read-only. No writes, no autonomous actions. Drafting tools (`prepare_*` / `prop
 
 ## Install
 
+**No bearer tokens. No manual config.** Paste the server URL, click Allow on the consent screen, you're done. v0.3.0 uses OAuth 2.1 + Dynamic Client Registration end-to-end.
+
 ### Prerequisites
 
-1. A DocJacket account with Owner or Admin role.
-2. A bearer token from [`app.docjacket.com/settings/ai-access`](https://app.docjacket.com/settings/ai-access) — mint a new one, label it "Codex Plugin".
+A DocJacket account on the **Pro plan**. Connecting is free; loading tools requires Pro.
 
-### Steps
+### Codex CLI / Codex for Work
 
 ```bash
 codex plugin marketplace add DocJacket-LLC/codex-plugin
 codex plugin install docjacket
-codex secret set docjacket.token <paste-your-bearer-token>
 ```
 
-Verify:
+On first tool call, your browser opens to complete OAuth consent. Codex stores access + refresh tokens in your local keychain. No secrets in config files.
+
+### ChatGPT (with MCP Connectors enabled — Plus / Team / Enterprise)
+
+1. **Settings** → **Connectors** → **+ Add MCP server**
+2. Paste: `https://mcp.docjacket.com/mcp`
+3. Click **Continue**, then **Allow** on the DocJacket consent screen
+
+10 tools load. You're done.
+
+### Verify
 
 ```bash
 codex chat
@@ -59,7 +69,7 @@ The MCP icon should show `docjacket` with 10 tools.
 
 ## How attribution + revocation work
 
-Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.2.0`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity).
+Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.3.0`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
 
 ## Optional connectors
 
@@ -71,12 +81,14 @@ Read-only. See [`DISCLAIMER.md`](DISCLAIMER.md) for the full scope and limitatio
 
 ## Version
 
+`0.3.0` (2026-05-18) — OAuth 2.1 + Dynamic Client Registration. Paste-URL-and-go install — no bearer tokens, no manual config. Tracks DocJacket MCP server PR #494 (HTTP 401 + WWW-Authenticate + `initialize` handshake).
+
 `0.2.0` (2026-05-18) — 10 read tools; Daily Triage collapsed to single `get_next_required_actions` call.
 `0.1.0` (2026-05-17) — Initial release: 5 read tools.
 
 ## Support
 
-- Docs: <https://docs.docjacket.com/mcp/codex>
+- Docs: <https://help.docjacket.com/docs/mcp/codex>
 - Issues: <https://github.com/DocJacket-LLC/codex-plugin/issues>
 - Email: support@docjacket.com
 
