@@ -8,7 +8,7 @@
       },
       "headers": {
         "X-DocJacket-Source-App": "codex",
-        "X-DocJacket-Plugin-Version": "0.3.0"
+        "X-DocJacket-Plugin-Version": "0.6.0"
       }
     }
   }

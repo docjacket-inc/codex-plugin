@@ -1,9 +1,9 @@
 {
   "name": "docjacket",
   "displayName": "DocJacket — TC Operating System",
-  "version": "0.3.0",
+  "version": "0.6.0",
   "publisher": "DocJacket",
-  "description": "Connect your DocJacket transactions, tasks, deadlines, and Prepared Work to Codex. Triage your pipeline in one prompt. Paste-URL-and-go install via OAuth 2.1 + DCR.",
+  "description": "Connect your DocJacket transactions, tasks, deadlines, contacts, and contingencies to Codex. v0.6 adds the inbox-workflow skill set — match Gmail emails against active deals, classify attachments, run morning briefings, prep for closings, and send follow-ups directly from your connected mailbox. The chat is the approval gate — you confirm in conversation, DocJacket executes immediately. Paste-URL-and-go install via OAuth 2.1 + DCR.",
   "homepage": "https://www.docjacket.com/mcp",
   "documentation": "https://help.docjacket.com/docs/mcp/codex",
   "support": "support@docjacket.com",
@@ -21,15 +21,24 @@
     ]
   },
   "skills": [
-    "../skills/daily-triage"
+    "../skills/daily-triage",
+    "../skills/execution-workflow",
+    "../skills/tc-context",
+    "../skills/email-triage",
+    "../skills/document-filing",
+    "../skills/follow-up-drafting",
+    "../skills/closing-prep"
   ],
   "mcp": "../.mcp.json",
   "app": "../.app.json",
   "starterPrompts": [
-    "Use DocJacket to summarize my active transactions.",
-    "Use DocJacket to find transactions that need attention today.",
-    "Use DocJacket to list deadlines this week.",
-    "Use DocJacket to show open tasks on the [property] deal.",
-    "Use DocJacket to look up the listing agent on [property]."
+    "Use DocJacket to triage my inbox against my active deals.",
+    "Use DocJacket to brief me on what needs attention this morning.",
+    "Use DocJacket to find which deal jane@example.com is on.",
+    "Use DocJacket to check what's missing on the [property] deal.",
+    "Use DocJacket to run a closing-prep check on the deal closing this Friday.",
+    "Use DocJacket to share the portal link for the [property] deal with the buyer.",
+    "Use DocJacket to send a weekly update to the buyer on [property].",
+    "Use DocJacket to ask the listing agent for the seller disclosure on [property]."
   ]
 }

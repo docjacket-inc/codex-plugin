@@ -5,27 +5,34 @@
 # DocJacket — Transaction Coordination plugin for Codex
 
 [![Plugin](https://img.shields.io/badge/Codex-plugin-purple)]()
-[![Version](https://img.shields.io/badge/version-0.3.0-green)]()
+[![Version](https://img.shields.io/badge/version-0.6.0-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
-Connect DocJacket transactions, tasks, deadlines, contacts, and document checklists to OpenAI Codex. Triage your pipeline, brief on any active deal, and check missing documents — all from inside Codex.
+Connect DocJacket transactions, tasks, deadlines, contacts, and document checklists to OpenAI Codex. Triage your pipeline, draft and send follow-up emails from your connected Gmail, classify inbound attachments against the right deal — all from inside Codex.
 
-**Works with:** Codex CLI · Codex for Work · ChatGPT (when Codex plugins reach the official directory)
+**Works with:** Codex CLI · Codex for Work · ChatGPT (with MCP Connectors enabled)
 
 ## What you get
 
-- **10 read tools** exposed via the DocJacket MCP server at `https://mcp.docjacket.com/mcp`
-- **Daily Triage** skill — `$docjacket-daily-triage` returns every transaction needing attention, pre-ranked
+- **Full read + send tool suite** via the DocJacket MCP server at `https://mcp.docjacket.com/mcp`. Call `mcp_catalog` after install for the live inventory + per-tool gotchas and example calls.
+- **`mcp_health_check`** — first call when integrating; verifies auth, scopes, and DB reachability.
+- **7 skills**: `daily-triage`, `execution-workflow`, `tc-context`, `email-triage`, `document-filing`, `follow-up-drafting`, `closing-prep`. Each ships as a directory under `skills/<name>/SKILL.md`.
 
-Read-only. No writes, no autonomous actions. Drafting tools (`prepare_*` / `propose_*`) ship in **v0.4** once the upstream MCP server reaches Phase 8.
+Three scope tiers — Read (search, summarize), Draft (compose without sending), Actions (send emails, create tasks, update dates). You authorize once at OAuth consent; the chat is the per-call approval gate.
 
 ## Tool catalog
 
-`search_transactions`, `get_transaction`, `get_key_dates`, `get_open_tasks`, `get_contacts`, `get_upcoming_key_dates`, `list_open_contingencies`, **`get_next_required_actions`** (bundled-judgment flagship), `find_transaction_by_property`, `get_missing_documents`.
+Selected highlights — for the **live and complete** list with per-tool gotchas, pairing hints, and example calls, run `mcp_catalog` after install.
+
+**Diagnostics + introspection**: `mcp_health_check`, `mcp_catalog`.
+
+**Reads**: `search_transactions`, `get_transaction`, `get_key_dates`, `get_open_tasks`, `get_contacts`, `get_upcoming_key_dates`, `list_open_contingencies`, **`get_next_required_actions`** (bundled-judgment flagship), `find_transaction_by_property`, `get_missing_documents`, `list_active_transactions`, `search_contacts`, `get_contact`, `list_email_templates`, `get_email_template`.
+
+**Direct execution**: `send_client_update`, `send_agent_followup`, `send_document_request`, `send_email_to_agent`, `create_tasks`, `update_key_date`, `complete_task`, `save_status_summary`, `render_email_template`, `add_contact_to_transaction`, `create_contact`.
 
 ## Install
 
-**No bearer tokens. No manual config.** Paste the server URL, click Allow on the consent screen, you're done. v0.3.0 uses OAuth 2.1 + Dynamic Client Registration end-to-end.
+**No bearer tokens. No manual config.** Paste the server URL, click Allow on the consent screen, you're done. OAuth 2.1 + Dynamic Client Registration end-to-end.
 
 ### Prerequisites
 
@@ -46,7 +53,7 @@ On first tool call, your browser opens to complete OAuth consent. Codex stores a
 2. Paste: `https://mcp.docjacket.com/mcp`
 3. Click **Continue**, then **Allow** on the DocJacket consent screen
 
-10 tools load. You're done.
+The tool list loads. Run `mcp_health_check` once to confirm scopes; then `mcp_catalog` for the full inventory.
 
 ### Verify
 
@@ -55,7 +62,7 @@ codex chat
 > Use DocJacket to summarize my active transactions.
 ```
 
-The MCP icon should show `docjacket` with 10 tools.
+The MCP icon should show `docjacket` connected. Run `mcp_catalog` for the current tool count.
 
 ## Starter prompts
 
@@ -69,7 +76,7 @@ The MCP icon should show `docjacket` with 10 tools.
 
 ## How attribution + revocation work
 
-Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.3.0`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
+Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.6.0`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
 
 ## Optional connectors
 
@@ -77,9 +84,11 @@ See [`CONNECTORS.md`](CONNECTORS.md) — Gmail / Calendar / Drive / Slack compos
 
 ## Compliance + disclaimer
 
-Read-only. See [`DISCLAIMER.md`](DISCLAIMER.md) for the full scope and limitations.
+This plugin does NOT provide legal advice. See [`DISCLAIMER.md`](DISCLAIMER.md) for the full scope and limitations.
 
 ## Version
+
+`0.6.0` (2026-05-19) — Catches up to the v0.6 internal source: 7 skills (was 1), inbox-workflow tool set including Draft + Actions scopes. New diagnostic tools `mcp_health_check` and `mcp_catalog`. Every tool response now includes `structuredContent` + opt-in `breadcrumbs` per MCP spec 2025-06-18 §Tool Result. Tracks DocJacket MCP server PRs #549–#551.
 
 `0.3.0` (2026-05-18) — OAuth 2.1 + Dynamic Client Registration. Paste-URL-and-go install — no bearer tokens, no manual config. Tracks DocJacket MCP server PR #494 (HTTP 401 + WWW-Authenticate + `initialize` handshake).
 

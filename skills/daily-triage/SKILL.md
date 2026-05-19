@@ -33,7 +33,6 @@ Trigger on any variation of:
 
 1. Call `docjacket.get_next_required_actions` with `limit: 75`. (Optional: pass `transactionId` to scope to a single deal.)
 2. The response is already sorted overdue-first and tagged with `urgency` per row — group by the `urgency` field as-is.
-3. (Once `docjacket.list_prepared_work` ships, add a second call to surface pending-approval items as a 4th bucket. Skip for now.)
 
 **Do not fan out per transaction** — the previous v0.1 workflow called `search_transactions` then `get_open_tasks` + `get_key_dates` per active deal then sorted client-side. That's been replaced by this single call, and re-introducing the old pattern wastes 50+ tool calls per triage on a busy org.
 
