@@ -217,7 +217,7 @@ When the customer's org is in **user-mailbox mode** (Option C), `send_*` tools r
 
 ## Migration from the old `prepare_*` / `propose_*` / `draft_*` tools
 
-If your manifest still references the old names, the server returns HTTP 410 Gone with the new tool name in the error body. Treat that as a hard rename — call the new tool with the same arguments and the action succeeds.
+If you encounter the old names in older skill files, transcripts, or third-party manifests, treat them as a straight rename — same arguments, just the new tool name. The server no longer registers the old names; a call to one returns an "unknown tool" error.
 
 | Old name | New name |
 |---|---|
