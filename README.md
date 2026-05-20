@@ -16,7 +16,7 @@ Connect DocJacket transactions, tasks, deadlines, contacts, and document checkli
 
 - **Full read + send tool suite** via the DocJacket MCP server at `https://mcp.docjacket.com/mcp`. Call `mcp_catalog` after install for the live inventory + per-tool gotchas and example calls.
 - **`mcp_health_check`** — first call when integrating; verifies auth, scopes, and DB reachability.
-- **7 skills**: `daily-triage`, `execution-workflow`, `tc-context`, `email-triage`, `document-filing`, `follow-up-drafting`, `closing-prep`. Each ships as a directory under `skills/<name>/SKILL.md`.
+- **8 skills**: `daily-triage`, `execution-workflow`, `tc-context`, `email-triage`, `document-filing`, `follow-up-drafting`, `closing-prep`, `contract-intake`. Each ships as a directory under `skills/<name>/SKILL.md`.
 
 Three scope tiers — Read (search, summarize), Draft (compose without sending), Actions (send emails, create tasks, update dates). You authorize once at OAuth consent; the chat is the per-call approval gate.
 
@@ -41,7 +41,7 @@ A DocJacket account on the **Pro plan**. Connecting is free; loading tools requi
 ### Codex CLI / Codex for Work
 
 ```bash
-codex plugin marketplace add DocJacket-LLC/codex-plugin
+codex plugin marketplace add docjacket-inc/codex-plugin
 codex plugin install docjacket
 ```
 
@@ -76,7 +76,7 @@ The MCP icon should show `docjacket` connected. Run `mcp_catalog` for the curren
 
 ## How attribution + revocation work
 
-Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.6.0`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
+Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.6.1`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
 
 ## Optional connectors
 
@@ -88,6 +88,8 @@ This plugin does NOT provide legal advice. See [`DISCLAIMER.md`](DISCLAIMER.md) 
 
 ## Version
 
+`0.6.1` (2026-05-20) — Version parity bump alongside the cowork plugin (docjacket-v3 PR #565). No codex content changes — the slash-commands surface added in this release is Claude-plugin-only; Codex skills are invoked via `$docjacket-*` patterns in CLI or plain English in ChatGPT.
+
 `0.6.0` (2026-05-19) — Catches up to the v0.6 internal source: 7 skills (was 1), inbox-workflow tool set including Draft + Actions scopes. New diagnostic tools `mcp_health_check` and `mcp_catalog`. Every tool response now includes `structuredContent` + opt-in `breadcrumbs` per MCP spec 2025-06-18 §Tool Result. Tracks DocJacket MCP server PRs #549–#551.
 
 `0.3.0` (2026-05-18) — OAuth 2.1 + Dynamic Client Registration. Paste-URL-and-go install — no bearer tokens, no manual config. Tracks DocJacket MCP server PR #494 (HTTP 401 + WWW-Authenticate + `initialize` handshake).
@@ -95,10 +97,16 @@ This plugin does NOT provide legal advice. See [`DISCLAIMER.md`](DISCLAIMER.md) 
 `0.2.0` (2026-05-18) — 10 read tools; Daily Triage collapsed to single `get_next_required_actions` call.
 `0.1.0` (2026-05-17) — Initial release: 5 read tools.
 
+## Read more on help.docjacket.com
+
+- **[Connect Codex / ChatGPT](https://help.docjacket.com/docs/mcp/codex)** — install walkthrough
+- **[Contract Intake](https://help.docjacket.com/docs/mcp/contract-intake)** — drop a PDF in chat, get a fully-set-up transaction back
+- **[Tool Catalog (`mcp_catalog`)](https://help.docjacket.com/docs/mcp/mcp-catalog)** — what `mcp_catalog` returns + how to read it
+- **[AI Access overview](https://help.docjacket.com/docs/ai-access)** — the umbrella feature, OAuth model, scope tiers, audit
+
 ## Support
 
-- Docs: <https://help.docjacket.com/docs/mcp/codex>
-- Issues: <https://github.com/DocJacket-LLC/codex-plugin/issues>
+- Issues: <https://github.com/docjacket-inc/codex-plugin/issues>
 - Email: support@docjacket.com
 
 ## Brand assets
