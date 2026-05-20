@@ -1,7 +1,7 @@
 {
   "name": "docjacket",
   "displayName": "DocJacket — TC Operating System",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "publisher": "DocJacket",
   "description": "Connect your DocJacket transactions, tasks, deadlines, contacts, and contingencies to Codex. v0.6 adds the inbox-workflow skill set — match Gmail emails against active deals, classify attachments, run morning briefings, prep for closings, and send follow-ups directly from your connected mailbox. The chat is the approval gate — you confirm in conversation, DocJacket executes immediately. Paste-URL-and-go install via OAuth 2.1 + DCR. Call `mcp_catalog` after install for the live tool inventory.",
   "homepage": "https://www.docjacket.com/mcp",
