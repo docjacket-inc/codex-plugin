@@ -1,15 +1,11 @@
-<!--
-  Generated from plugins/shared/skills/contract-intake.md — do not hand-edit.
-  Update the canonical file and re-sync. See plugins/README.md for the rule.
-  Generator: hand-curated v1 (per spec §3.3). Last sync: 2026-05-19.
--->
-
 ---
 name: contract-intake
 title: Intake a contract PDF and build a complete transaction in one conversation
 purpose: Walk a TC from "I just got a signed contract" to "the deal is fully set up in DocJacket" without leaving the chat — extract, review, apply, schedule, confirm.
 applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
 tools_used:
+  - request_upload_url
+  - kick_off_extraction
   - upload_document_for_extraction
   - get_extraction_results
   - apply_extraction
@@ -46,18 +42,36 @@ The flow has five phases. Each ends with the LLM confirming the result before th
 
 ### Phase 1 — Upload + extract
 
+**Two-step (preferred, default).** Keeps PDF bytes out of chat context — a 5 MB PDF base64-encoded would balloon to ~6.7 MB of chat tokens and compound across every later turn, blowing the context window mid-conversation. Use this path for any PDF over ~1 MB.
+
+```
+1a. request_upload_url({ filename: "contract.pdf" })
+    → { uploadId, uploadUrl, method: "PUT", headers, expiresAt }
+
+1b. (client PUTs the PDF bytes to uploadUrl with the returned headers — happens outside the LLM)
+
+1c. kick_off_extraction({
+      uploadId,             // from request_upload_url
+      filename,             // display name; same as 1a
+      state,                // "FL" | "NV" | ... (optional but boosts accuracy)
+      side,                 // "Buyer" | "Seller" (optional; inferred from extraction)
+      documentTypeHint      // "purchase_agreement" | "listing_agreement" | ...
+    })
+    → { extractionJobId, status: "queued", estimatedSecondsToComplete, cacheHit }
+```
+
+**Single-step (fallback).** Use only when the client can't PUT to a presigned URL, or for very small PDFs (~under 1 MB).
+
 ```
 1. upload_document_for_extraction({
-     fileBase64,           // from the attached PDF
-     filename,             // user-provided or "contract.pdf"
-     state,                // "FL" | "NV" | ... (optional but boosts accuracy)
-     side,                 // "Buyer" | "Seller" (optional; inferred from extraction)
-     documentTypeHint      // "purchase_agreement" | "listing_agreement" | ...
+     fileBase64,           // base64 of the PDF — rides in chat context
+     filename,
+     state, side, documentTypeHint
    })
    → { extractionJobId, status: "queued", estimatedSecondsToComplete, cacheHit }
 ```
 
-If `cacheHit` comes back true, the same PDF was uploaded before — the response includes the prior job's complete results immediately. Skip Phase 2's polling loop.
+If `cacheHit` comes back true (either path), the same PDF was uploaded before — the response includes the prior job's complete results immediately. Skip Phase 2's polling loop.
 
 ### Phase 2 — Poll until extraction completes
 
@@ -71,7 +85,7 @@ If `cacheHit` comes back true, the same PDF was uploaded before — the response
 
 **Polling cadence: every 2-3 seconds. Max wait: 10 minutes** (typical job is 50-350s; the max-wait is for hung-job safety). While polling, update the user with a one-line "still working…" if more than ~15 seconds pass — don't go silent.
 
-If `status: "failed"`, surface the `errorMessage` and ask whether to retry with `upload_document_for_extraction` (same file) or escalate.
+If `status: "failed"`, surface the `errorMessage` and ask whether to retry the upload (Phase 1 again, same file) or escalate.
 
 ### Phase 3 — Present extracted fields, get confirmation, apply
 
@@ -226,7 +240,7 @@ If the conversation resumes on a different surface (TC switched from Claude iOS 
 
 ## Idempotency
 
-- **`upload_document_for_extraction`** is content-hash deduped (90-day cache). A retry returns `cacheHit: true` with the prior job's ID.
+- **`kick_off_extraction`** and **`upload_document_for_extraction`** share the same content-hash dedup (90-day cache). A retry of the same PDF — via either path — returns `cacheHit: true` with the prior job's ID.
 - **`apply_extraction`** is race-safe — a second call after success returns the same `transactionId` (response shows `status: "already_applied"`).
 - **`create_reminder`** dedups on `(deadlineType, daysBeforeReminder)` per transaction; duplicate call returns `DUPLICATE_REMINDER`.
 - **`add_key_dates_batch`** doesn't dedup at the batch level but each row is idempotent — re-adding the same `keyDateType` updates the existing slot.
@@ -251,7 +265,9 @@ If a TC's prior workflow was the web app's upload wizard, this chat flow lands t
 
 | Tool | Scope | When |
 |---|---|---|
-| `upload_document_for_extraction` | Actions / `upload_document` | Phase 1 — kick off the pipeline |
+| `request_upload_url` | Actions / `upload_document` | Phase 1a — preferred path: get a presigned PUT URL |
+| `kick_off_extraction` | Actions / `upload_document` | Phase 1c — preferred path: start the pipeline after upload |
+| `upload_document_for_extraction` | Actions / `upload_document` | Phase 1 fallback — small PDFs / no-presigned-URL clients |
 | `get_extraction_results` | Read / `documents:read` | Phase 2 — poll for completion |
 | `apply_extraction` | Actions / `transactions:create` | Phase 3 — confirm and create the transaction |
 | `add_key_dates_batch` | Draft / `key_dates:propose` | Phase 4 — batch-add timeline dates |
