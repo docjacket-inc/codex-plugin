@@ -4,6 +4,8 @@ title: Intake a contract PDF and build a complete transaction in one conversatio
 purpose: Walk a TC from "I just got a signed contract" to "the deal is fully set up in DocJacket" without leaving the chat — extract, review, apply, schedule, confirm.
 applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
 tools_used:
+  - list_documents
+  - extract_existing_document
   - request_upload_url
   - kick_off_extraction
   - upload_document_for_extraction
@@ -42,36 +44,52 @@ The flow has five phases. Each ends with the LLM confirming the result before th
 
 ### Phase 1 — Upload + extract
 
-**Two-step (preferred, default).** Keeps PDF bytes out of chat context — a 5 MB PDF base64-encoded would balloon to ~6.7 MB of chat tokens and compound across every later turn, blowing the context window mid-conversation. Use this path for any PDF over ~1 MB.
+There are three paths. Pick by where the PDF is and what the MCP client supports.
+
+**Path A — Already in DocJacket (canonical, prefer this).** The TC uploaded the PDF earlier via DocDrop, email intake, the web wizard, or a prior chat call. No bytes move; DocJacket already has them. Works in every MCP client (Cowork, Codex, ChatGPT, Claude.ai free or paid, Gemini).
 
 ```
-1a. request_upload_url({ filename: "contract.pdf" })
-    → { uploadId, uploadUrl, method: "PUT", headers, expiresAt }
+1a. list_documents({ hasExtraction: false, limit: 20 })   // discovery
+    → { documents: [{ documentId, filename, uploadDate, transactionAddress, ... }] }
 
-1b. (client PUTs the PDF bytes to uploadUrl with the returned headers — happens outside the LLM)
+1b. (Confirm with the TC: "Found 3 documents uploaded today — extract 'fl-buyer-purchase.pdf'?")
 
-1c. kick_off_extraction({
-      uploadId,             // from request_upload_url
-      filename,             // display name; same as 1a
-      state,                // "FL" | "NV" | ... (optional but boosts accuracy)
-      side,                 // "Buyer" | "Seller" (optional; inferred from extraction)
-      documentTypeHint      // "purchase_agreement" | "listing_agreement" | ...
+1c. extract_existing_document({
+      documentId,           // from list_documents
+      state,                // "FL" | "NV" | ... (optional; overrides stored)
+      side,                 // "Buyer" | "Seller" (optional)
+      documentTypeHint      // optional; falls back to stored DocumentType
     })
     → { extractionJobId, status: "queued", estimatedSecondsToComplete, cacheHit }
 ```
 
-**Single-step (fallback).** Use only when the client can't PUT to a presigned URL, or for very small PDFs (~under 1 MB).
+When the TC says "extract the contract I uploaded last night" or "process the file from this morning," this is the path. Always call `list_documents` first to surface candidates rather than guessing.
+
+**Path B — Attached to chat, Claude.ai paid + code execution.** TC drops a PDF directly in chat that isn't in DocJacket yet. Two-step presigned upload: bytes go from the LLM's sandbox to blob storage via curl, never touching chat tokens.
 
 ```
-1. upload_document_for_extraction({
-     fileBase64,           // base64 of the PDF — rides in chat context
-     filename,
-     state, side, documentTypeHint
-   })
+2a. request_upload_url({ filename: "contract.pdf" })
+    → { uploadId, uploadUrl, method: "PUT", headers, expiresAt }
+
+2b. (In the code-execution sandbox:)
+    bash> curl -X PUT -T /mnt/user-data/uploads/contract.pdf \
+            -H "x-ms-blob-type: BlockBlob" -H "Content-Type: application/pdf" \
+            "<uploadUrl>"
+
+2c. kick_off_extraction({ uploadId, filename, state?, side?, documentTypeHint? })
+    → { extractionJobId, status: "queued", estimatedSecondsToComplete, cacheHit }
+```
+
+Requires a paid Claude.ai plan with code execution enabled AND `mcp.docjacket.com` added under Settings → Capabilities → Code execution → Additional allowed domains. If 2b returns a 403 / DNS error, the user almost certainly missed the domain whitelist — surface that with a link to https://help.docjacket.com/docs/ai-access/setup and fall back to Path C.
+
+**Path C — Attached to chat, anywhere else (fallback).** Tiny PDFs (~under 1 MB) attached to chat with no other option. Bytes ride in chat context for the rest of the conversation; compounds with later turns, so only use when paths A and B don't apply.
+
+```
+3. upload_document_for_extraction({ fileBase64, filename, state?, side?, documentTypeHint? })
    → { extractionJobId, status: "queued", estimatedSecondsToComplete, cacheHit }
 ```
 
-If `cacheHit` comes back true (either path), the same PDF was uploaded before — the response includes the prior job's complete results immediately. Skip Phase 2's polling loop.
+If `cacheHit` comes back true (any path), the same PDF was extracted before — the response includes the prior job's complete results immediately. Skip Phase 2's polling loop.
 
 ### Phase 2 — Poll until extraction completes
 
@@ -240,7 +258,7 @@ If the conversation resumes on a different surface (TC switched from Claude iOS 
 
 ## Idempotency
 
-- **`kick_off_extraction`** and **`upload_document_for_extraction`** share the same content-hash dedup (90-day cache). A retry of the same PDF — via either path — returns `cacheHit: true` with the prior job's ID.
+- **`extract_existing_document`**, **`kick_off_extraction`**, and **`upload_document_for_extraction`** all share the same content-hash dedup (90-day cache). A retry of the same PDF — via any path — returns `cacheHit: true` with the prior job's ID.
 - **`apply_extraction`** is race-safe — a second call after success returns the same `transactionId` (response shows `status: "already_applied"`).
 - **`create_reminder`** dedups on `(deadlineType, daysBeforeReminder)` per transaction; duplicate call returns `DUPLICATE_REMINDER`.
 - **`add_key_dates_batch`** doesn't dedup at the batch level but each row is idempotent — re-adding the same `keyDateType` updates the existing slot.
@@ -265,9 +283,11 @@ If a TC's prior workflow was the web app's upload wizard, this chat flow lands t
 
 | Tool | Scope | When |
 |---|---|---|
-| `request_upload_url` | Actions / `upload_document` | Phase 1a — preferred path: get a presigned PUT URL |
-| `kick_off_extraction` | Actions / `upload_document` | Phase 1c — preferred path: start the pipeline after upload |
-| `upload_document_for_extraction` | Actions / `upload_document` | Phase 1 fallback — small PDFs / no-presigned-URL clients |
+| `list_documents` | Read / `documents:read` | Phase 1a — Path A — find docs already in DocJacket |
+| `extract_existing_document` | Actions / `upload_document` | Phase 1c — Path A — canonical: extract a doc already in DocJacket |
+| `request_upload_url` | Actions / `upload_document` | Phase 2a — Path B — Claude.ai paid + code execution only |
+| `kick_off_extraction` | Actions / `upload_document` | Phase 2c — Path B — start pipeline after sandbox PUT |
+| `upload_document_for_extraction` | Actions / `upload_document` | Phase 3 — Path C — base64 fallback for tiny chat-attached PDFs |
 | `get_extraction_results` | Read / `documents:read` | Phase 2 — poll for completion |
 | `apply_extraction` | Actions / `transactions:create` | Phase 3 — confirm and create the transaction |
 | `add_key_dates_batch` | Draft / `key_dates:propose` | Phase 4 — batch-add timeline dates |
