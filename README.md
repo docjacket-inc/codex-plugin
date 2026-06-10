@@ -5,7 +5,7 @@
 # DocJacket — Transaction Coordination plugin for Codex
 
 [![Plugin](https://img.shields.io/badge/Codex-plugin-purple)]()
-[![Version](https://img.shields.io/badge/version-0.6.2-green)]()
+[![Version](https://img.shields.io/badge/version-0.7.0-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
 Connect DocJacket transactions, tasks, deadlines, contacts, and document checklists to OpenAI Codex. Triage your pipeline, draft and send follow-up emails from your connected Gmail, classify inbound attachments against the right deal — all from inside Codex.
@@ -76,7 +76,7 @@ The MCP icon should show `docjacket` connected. Run `mcp_catalog` for the curren
 
 ## How attribution + revocation work
 
-Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.6.2`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
+Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.7.0`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
 
 ## Optional connectors
 
