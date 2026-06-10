@@ -1,9 +1,9 @@
 {
   "name": "docjacket",
   "displayName": "DocJacket — TC Operating System",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "publisher": "DocJacket",
-  "description": "Connect your DocJacket transactions, tasks, deadlines, contacts, and contingencies to Codex. v0.6 adds the inbox-workflow skill set — match Gmail emails against active deals, classify attachments, run morning briefings, prep for closings, and send follow-ups directly from your connected mailbox. The chat is the approval gate — you confirm in conversation, DocJacket executes immediately. Paste-URL-and-go install via OAuth 2.1 + DCR. Call `mcp_catalog` after install for the live tool inventory.",
+  "description": "Connect your DocJacket transactions, tasks, deadlines, contacts, and contingencies to Codex. v0.7 adds the contact-management skill — look up, create, and link the people on a deal, including adding a custom contact role in-chat when nothing existing fits. The chat is the approval gate — you confirm in conversation, DocJacket executes immediately. Paste-URL-and-go install via OAuth 2.1 + DCR. Call `mcp_catalog` after install for the live tool inventory.",
   "homepage": "https://www.docjacket.com/mcp",
   "documentation": "https://help.docjacket.com/docs/mcp/codex",
   "support": "support@docjacket.com",
@@ -28,7 +28,8 @@
     "../skills/email-triage",
     "../skills/document-filing",
     "../skills/follow-up-drafting",
-    "../skills/closing-prep"
+    "../skills/closing-prep",
+    "../skills/contact-management"
   ],
   "mcp": "../.mcp.json",
   "app": "../.app.json",
