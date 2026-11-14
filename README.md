@@ -5,7 +5,7 @@
 # DocJacket — Transaction Coordination plugin for Codex
 
 [![Plugin](https://img.shields.io/badge/Codex-plugin-purple)]()
-[![Version](https://img.shields.io/badge/version-0.7.0-green)]()
+[![Version](https://img.shields.io/badge/version-0.8.0-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
 Connect DocJacket transactions, tasks, deadlines, contacts, and document checklists to OpenAI Codex. Triage your pipeline, draft and send follow-up emails from your connected Gmail, classify inbound attachments against the right deal — all from inside Codex.
@@ -16,7 +16,7 @@ Connect DocJacket transactions, tasks, deadlines, contacts, and document checkli
 
 - **Full read + send tool suite** via the DocJacket MCP server at `https://mcp.docjacket.com/mcp`. Call `mcp_catalog` after install for the live inventory + per-tool gotchas and example calls.
 - **`mcp_health_check`** — first call when integrating; verifies auth, scopes, and DB reachability.
-- **8 skills**: `daily-triage`, `execution-workflow`, `tc-context`, `email-triage`, `document-filing`, `follow-up-drafting`, `closing-prep`, `contract-intake`. Each ships as a directory under `skills/<name>/SKILL.md`.
+- **10 skills**: `closing-prep`, `contact-management`, `contract-intake`, `daily-triage`, `dj-cli`, `document-filing`, `email-triage`, `execution-workflow`, `follow-up-drafting`, `tc-context`. Each ships as an Agent Skill under `skills/<name>/SKILL.md`.
 
 Three scope tiers — Read (search, summarize), Draft (compose without sending), Actions (send emails, create tasks, update dates). You authorize once at OAuth consent; the chat is the per-call approval gate.
 
@@ -76,7 +76,7 @@ The MCP icon should show `docjacket` connected. Run `mcp_catalog` for the curren
 
 ## How attribution + revocation work
 
-Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.7.0`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
+Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.8.0`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
 
 ## Optional connectors
 
@@ -87,6 +87,8 @@ See [`CONNECTORS.md`](CONNECTORS.md) — Gmail / Calendar / Drive / Slack compos
 This plugin does NOT provide legal advice. See [`DISCLAIMER.md`](DISCLAIMER.md) for the full scope and limitations.
 
 ## Version
+
+`0.8.0` (2026-11-14) — portable `plugin.json` and `mcp.json`; all ten skills as valid Agent Skills under `skills/<name>/SKILL.md`; OAuth sign-in replaces the pasted bearer token; `.app.json` removed.
 
 `0.6.1` (2026-05-20) — Version parity bump alongside the cowork plugin (docjacket-v3 PR #565). No codex content changes — the slash-commands surface added in this release is Claude-plugin-only; Codex skills are invoked via `$docjacket-*` patterns in CLI or plain English in ChatGPT.
 

@@ -1,23 +1,17 @@
-<!--
-  Generated from plugins/shared/skills/document-filing.md — do not hand-edit.
-  Update the canonical file and re-sync. See plugins/README.md for the rule.
-  Generator: hand-curated v1 (per spec §3.3). Last sync: 2026-05-19.
--->
-
 ---
 name: document-filing
-title: Classify documents and propose filing them to the right transaction
-purpose: Help the TC identify what each attachment is + which transaction it belongs to. DocJacket's classifier suggests; the TC files manually until an upload tool ships.
-applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
-tools_used:
-  - classify_document
-  - get_missing_documents
-  - search_transactions
-  - find_contact_by_email
-  - create_tasks
-expected_output: A "[filename] looks like [type] for [transaction] — fills a gap on the missing-docs list" prompt for the TC, with an optional follow-up task to ensure the doc gets uploaded.
-required_scopes: [read]
-version: 1.0.0
+description: >-
+  Helps the TC identify what each attachment is and which DocJacket transaction it belongs to.
+  DocJacket's classifier suggests a document type; the TC decides where it is filed. Produces a
+  "[filename] looks like [type] for [transaction]" prompt that notes when it fills a gap on the
+  missing-documents list, with an optional follow-up task so the document gets uploaded. Use when
+  the TC has attachments or documents to identify, classify or file to a deal.
+license: MIT
+metadata:
+  docjacket-title: "Classify documents and propose filing them to the right transaction"
+  docjacket-tools: "classify_document get_missing_documents search_transactions find_contact_by_email create_tasks"
+  docjacket-scopes: "read"
+  docjacket-version: "1.0.0"
 ---
 
 # Document Filing
@@ -90,7 +84,7 @@ That gives the TC a tracked item and an audit trail.
 
 ### Step 6 — If the attachment came from email-triage
 
-Bundle the filing-task with the follow-up email. One confirmation: _"I'll thank Mike for the inspection report + add a task to upload it to DocJacket. Sound good?"_ → on yes, fire `send_agent_followup` + `create_tasks`.
+Bundle the filing-task with the follow-up email. One confirmation: _"I'll thank Mike for the inspection report + add a task to upload it to DocJacket. Sound good?"_ → on yes, call `send_agent_followup` + `create_tasks`. Show the email preview and send it with `confirm_email_send` only on the user's explicit yes (or tell them it is waiting for approval if it was `parked_for_review`). The task is created right away.
 
 ## Compliance-sensitive types — always confirm
 

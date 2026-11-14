@@ -1,21 +1,21 @@
 ---
 name: contact-management
-title: Manage DocJacket contacts and link them to transactions
-purpose: Look up, create, and link the people on a deal — agents, lenders, attorneys, inspectors — and add a custom contact role when nothing existing fits. Use when the TC mentions contacts or parties, when a new party surfaces during intake or email triage, or when add_contact_to_transaction reports the role doesn't exist.
-applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
-tools_used:
-  - search_contacts
-  - find_contact_by_email
-  - get_contact
-  - create_contact
-  - add_contact_to_transaction
-  - create_contact_role
+description: >-
+  Manages DocJacket contacts and links them to transactions: search, get, create and link. Use
+  when the TC mentions contacts, parties, adding someone to a transaction, looking up an agent /
+  lender / inspector / title company, or when a new party needs to be added during intake or email
+  triage.
+license: MIT
+metadata:
+  docjacket-title: "Manage DocJacket contacts and link them to transactions"
+  docjacket-tools: "search_contacts get_contact get_contacts find_contact_by_email create_contact create_contact_role add_contact_to_transaction search_transactions find_transaction_by_property render_email_template"
+  docjacket-scopes: "read actions"
 ---
 
 # Contact Management
 
 Four building blocks: search, get, create, link. Combine them for the common
-flows below. Never duplicate a contact — always search first.
+flows below. Never duplicate a contact — always search first. Get every `contactId` from `search_contacts`, `get_contacts` or `find_contact_by_email`; never guess one. Send a request id (`X-DocJacket-Client-Request-Id`) on writes and retry with the same one (see `execution-workflow`).
 
 ## Looking up a contact
 

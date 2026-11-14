@@ -1,18 +1,15 @@
-<!--
-  Generated from plugins/shared/skills/tc-context.md — do not hand-edit.
-  Update the canonical file and re-sync. See plugins/README.md for the rule.
-  Generator: hand-curated v1 (per spec §3.3). Last sync: 2026-05-19.
--->
-
 ---
 name: tc-context
-title: Transaction Coordinator vocabulary and DocJacket data model
-purpose: Ground the agent in real-estate-TC terminology, the DocJacket object model, and the safety rules that apply to every action taken on a transaction.
-applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
-tools_used: []
-expected_output: Internal context — fires alongside other skills to keep reasoning grounded. Doesn't produce output itself.
-required_scopes: [read]
-version: 1.0.0
+description: >-
+  Grounds the agent in real-estate transaction-coordinator terminology, the DocJacket object
+  model, and the safety rules that apply to every action taken on a transaction. Internal context
+  that fires alongside other skills and produces no output of its own. Use whenever working with
+  DocJacket transactions or when TC vocabulary comes up.
+license: MIT
+metadata:
+  docjacket-title: "Transaction Coordinator vocabulary and DocJacket data model"
+  docjacket-scopes: "read"
+  docjacket-version: "1.0.0"
 ---
 
 # Transaction Coordinator Context
@@ -55,9 +52,9 @@ When you have a sender or subject and need to figure out which deal it belongs t
 
 ## Safety rules
 
-The chat IS the approval gate (see `execution-workflow` skill). That means **you compose, the user confirms in chat, then you fire the action tool — DocJacket executes immediately**. Three rules apply regardless of how confident you are:
+You compose, the user confirms in chat, then you call the action tool (see `execution-workflow` skill). Internal writes (tasks, key dates, contacts) run on call. Emails are previewed first: you show the user the full preview and send with `confirm_email_send` only on their explicit yes, or the email waits in the DocJacket review queue for a team member (`parked_for_review`). Never report an email as on its way unless `confirm_email_send` returned `queued`. Three rules apply regardless of how confident you are:
 
-1. **Confirm before any `send_*` / `create_*` / `update_*` / `save_*` call.** The user's "yes" in chat is what authorizes the action. If the user's instruction is unambiguous and self-contained ("send the buyer the weekly update we just drafted"), you can fire without a separate confirmation turn. Use judgment.
+1. **Confirm before any `send_*` / `create_*` / `update_*` / `save_*` call.** The `send_*` call returns a preview; show it in full and wait for a yes before `confirm_email_send`. For internal writes, if the instruction is unambiguous and self-contained ("move the inspection deadline to June 1"), you can call without a separate confirmation turn. Use judgment.
 
 2. **Compliance-sensitive items always need explicit user confirmation** — Closing Disclosure timing, Title Commitment, wire instructions, key-date moves that affect funding. Even if the user just said "yes do it," double-check on these before firing.
 
@@ -70,4 +67,4 @@ The chat IS the approval gate (see `execution-workflow` skill). That means **you
 - Avoid jargon the TC didn't use first ("artifact", "schema", "endpoint"). Match their vocabulary.
 - When you list deals, address-first ("412 Oak St (Smith)"), not name-first.
 - After a successful action, report what happened in one line:
-  > _"✅ Email sent to Jane Doe (jane@example.com) — Subject: 'Weekly update — 412 Oak St'"_
+  > _"Done: moved the inspection deadline to June 1."_ For an email, only after `confirm_email_send` returns `queued`: _"Approved, on its way to Jane Doe."_ If it was parked: _"The email to Jane Doe is waiting for approval in DocJacket, not sent yet."_

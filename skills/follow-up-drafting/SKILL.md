@@ -1,29 +1,18 @@
-<!--
-  Generated from plugins/shared/skills/follow-up-drafting.md — do not hand-edit.
-  Update the canonical file and re-sync. See plugins/README.md for the rule.
-  Generator: hand-curated v1 (per spec §3.3). Last sync: 2026-05-19.
--->
-
 ---
 name: follow-up-drafting
-title: Draft and send follow-up emails for missing documents, approaching deadlines, and unanswered communications
-purpose: Compose chase emails with tone calibrated for urgency + recipient; confirm in chat; fire the matching send_* tool.
-applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
-tools_used:
-  - get_transaction
-  - get_key_dates
-  - get_upcoming_key_dates
-  - get_missing_documents
-  - get_open_tasks
-  - get_contacts
-  - find_contact_by_email
-  - send_client_update
-  - send_document_request
-  - send_agent_followup
-  - send_email_to_agent
-expected_output: A drafted email shown inline, an explicit confirmation prompt, then the matching send_* tool fires. The result includes the recipient + subject so the TC has a clear record.
-required_scopes: [draft]
-version: 1.0.0
+description: >-
+  Composes chase emails for missing documents, approaching deadlines and unanswered
+  communications, with tone calibrated to urgency and recipient. Shows the draft inline, asks for
+  confirmation, calls the matching send_* tool for a preview, then calls confirm_email_send on the
+  user's explicit yes; if the email was parked for review it reports that it is waiting for
+  approval, not sent. Use when the TC asks to follow up, chase a document, nudge an agent or
+  lender, or remind a party about a deadline.
+license: MIT
+metadata:
+  docjacket-title: "Draft and send follow-up emails for missing documents, approaching deadlines, and unanswered communications"
+  docjacket-tools: "get_transaction get_key_dates get_upcoming_key_dates get_missing_documents get_open_tasks get_contacts find_contact_by_email send_client_update send_document_request send_agent_followup send_email_to_agent confirm_email_send"
+  docjacket-scopes: "draft"
+  docjacket-version: "1.1.0"
 ---
 
 # Follow-Up Drafting
@@ -94,7 +83,7 @@ You (the model) compose the subject + body using the context. Include:
 
 ### Step 5 — Confirm in chat
 
-Per `execution-workflow` — the chat is the approval gate. Show the draft inline:
+Per `execution-workflow`, show the complete draft inline before you call anything:
 
 ```
 Drafted for Mike Park (buyer agent):
@@ -111,29 +100,40 @@ Casey
 Want me to send it?
 ```
 
-Wait for the user's "yes" before firing the tool.
+Wait for the user's "yes" before calling the tool.
 
-### Step 6 — Fire the right `send_*` tool
+### Step 6 — Call the right `send_*` tool (this previews; it does not send)
 
-Pass `transactionId`, `recipientContactId` (or `recipientRole`), `subject`, `bodyHtml`, `bodyPlainText`. The tool returns a result like:
+Pass `transactionId`, `recipientContactId` (or `recipientRole`), `subject`, `bodyHtml`, `bodyPlainText`. The recipient must already be a contact on the deal. The result is one of:
 
 ```json
 {
-  "status": "sent",
-  "transactionId": "<guid>",
-  "summary": "Email sent to Mike Park (mike@parkrealty.com) — subject: 'Survey needed for 412 Oak St — closing 5/22'",
-  "outcome": "enqueued for mike@parkrealty.com via Gmail, outbox id=…"
+  "status": "awaiting_confirmation",
+  "confirmCode": "djc_...",
+  "expiresAt": "2026-11-06T18:00:00Z",
+  "recipient": "Mike Park (mike@parkrealty.com)",
+  "preview": { "to": [...], "subject": "Survey needed for 412 Oak St — closing 5/22", "bodyHtml": "...", "bodyText": "...", "attachments": [] }
 }
 ```
 
-### Step 7 — Report to the user
+or `"status": "parked_for_review"` (the email is NOT sent; it waits in the DocJacket review queue for a team member, `reviewReason` says why, and there is no code).
+
+Send once. If a call timed out, retry with the same `X-DocJacket-Client-Request-Id` (see `execution-workflow`).
+
+### Step 7 — Show the preview, then confirm
+
+For `awaiting_confirmation`, show the user the COMPLETE email from `preview` (recipients, subject, full body, attachments) and ask. Only on an explicit yes, call `confirm_email_send({ confirmCode })`; on no, `confirm_email_send({ confirmCode, decision: "discard" })`. If it returns `CONFIRM_CODE_EXPIRED`, `CONTENT_CHANGED` or `SUPERSEDED`, call the send tool again and show the new preview. For `REVIEW_REQUIRED`, `NOT_ALLOWED_TO_CONFIRM`, `RECIPIENT_NOT_ALLOWED` or `NO_LONGER_PENDING`, tell the user it is waiting in the review queue. Full table in `execution-workflow`.
+
+### Step 8 — Report to the user
+
+Only when `confirm_email_send` returned `queued`:
 
 ```
-✅ Email sent to Mike Park (mike@parkrealty.com)
+Approved and on its way to Mike Park (mike@parkrealty.com)
    Subject: "Survey needed for 412 Oak St — closing 5/22"
-
-You can see this on the Smith deal's activity feed.
 ```
+
+For `parked_for_review`: "It is waiting for approval in DocJacket, not sent yet." For `discarded`: say nothing was sent.
 
 ## Email rules (in the composed body)
 
@@ -179,8 +179,10 @@ Casey
 
 ## Don't do
 
-- **Don't fire `send_*` without an explicit user yes.** Per `execution-workflow`.
+- **Don't call `send_*` without an explicit user yes.** Per `execution-workflow`.
+- **Don't say the email is on its way** unless `confirm_email_send` returned `queued`. `parked_for_review` means it is waiting for approval.
+- **Don't call `confirm_email_send` without the user's explicit yes to the complete preview.**
 - **Don't impersonate the TC's personal voice perfectly on day 1.** Use a professional default; the TC can ask you to adjust before sending.
 - **Don't fabricate facts.** Only state things the tools confirmed.
 - **Don't pile on.** If multiple items need follow-up with the same party, bundle them into one email.
-- **Don't say "Pending Review" or link `/prepared-work`.** That UI is retired. Say _"sent"_ when the action completes.
+- **Don't say "Pending Review" or link `/prepared-work`.** That UI is retired. Say the email is waiting for approval.

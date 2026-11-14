@@ -1,52 +1,61 @@
-<!--
-  Generated from plugins/shared/skills/execution-workflow.md — do not hand-edit.
-  Update the canonical file and re-sync. See plugins/README.md for the rule.
-  Generator: hand-curated v1 (per spec §3.3). Last sync: 2026-05-19.
--->
-
 ---
 name: execution-workflow
-title: Send emails, create tasks, and update key dates directly in DocJacket
-purpose: Compose work artifacts upstream in chat. Confirm with the user. Then call the matching action tool — DocJacket executes immediately. No second approval in DocJacket.
-applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
-tools_used:
-  - send_client_update
-  - send_document_request
-  - send_agent_followup
-  - send_email_to_agent
-  - create_tasks
-  - update_key_date
-  - add_key_dates_batch
-  - create_reminder
-  - save_status_summary
-expected_output: A status (sent / created / updated / saved) plus a one-line summary of what was done. The user sees the result on the transaction's activity feed.
-required_scopes: [draft]
-version: 1.1.0
+description: >-
+  Composes work in chat and carries it out in DocJacket. Emails are previewed to the user and sent
+  only after an explicit yes via confirm_email_send (or wait in the DocJacket review queue for a
+  team member); internal changes (tasks, key dates, reminders, contacts, Playbooks) run on call.
+  Reports a status such as awaiting_confirmation, parked_for_review, queued, created or updated,
+  plus a one-line summary of what was done or what is waiting; an email is never reported as on
+  its way unless confirm_email_send returned status queued. Use when the TC asks to send an email,
+  create or change tasks, update key dates, set reminders, add or update contacts, send calendar
+  invites, or apply a Playbook.
+license: MIT
+metadata:
+  docjacket-title: "Send emails, create tasks, and update key dates in DocJacket"
+  docjacket-tools: "send_client_update send_document_request send_agent_followup send_email_to_agent confirm_email_send create_tasks complete_task update_task reschedule_task reassign_task delete_tasks update_key_date add_key_dates_batch create_reminder update_reminder cancel_reminder get_reminders save_status_summary search_contacts create_contact update_contact add_contact_to_transaction create_deal_calendar_event send_key_date_invites cancel_key_date_invites list_playbooks get_playbook preview_playbook apply_playbook undo_playbook start_playbook_draft list_playbook_drafts commit_playbook_draft undo_playbook_setup"
+  docjacket-scopes: "draft"
+  docjacket-version: "1.2.0"
 ---
 
 # Execution workflow
 
-> **What changed (2026-05-19):** the prior version of this skill (`drafting-workflow`) routed every tool call through a Pending Review tray in DocJacket. That tray has been retired — the chat conversation between you and the user **is** the approval gate. By the time you call a tool, the user has read your proposal and said yes, so DocJacket executes immediately. The old `prepare_*` / `propose_*` / `draft_*` / `suggest_*` tool names are deprecated; use the names in this skill.
+> **Retired:** the old `prepare_*` / `propose_*` / `draft_*` / `suggest_*` tools and the Pending Review tray are gone. Use the tool names in this skill.
 
 ## Architecture
 
-You compose. The user confirms in chat. DocJacket executes.
+You compose. The user confirms in chat. Then there are two tiers.
 
-Every `send_*` / `create_*` / `update_*` / `save_*` tool in this catalog takes a **finished** subject + body / payload and performs the action on call. DocJacket does not call an LLM on its side. The customer is paying for your composition through their Claude / ChatGPT / Codex / Cowork / Gemini subscription; DocJacket gets one cheap API call per action.
+1. **Messages that reach other people** (the four `send_*` email tools, `send_key_date_invites`, `cancel_key_date_invites`). Nothing is sent by the first call. An email send tool returns a preview and a `confirmCode` (or parks the email for a team member's review); you send it with `confirm_email_send` only after the user says yes to the preview. Calendar invites work the same way with their own status and code.
+2. **Internal writes** (tasks, key dates, reminders, contacts, calendar events, Playbooks, status summaries). The tool performs the action on call, so confirm intent in chat first.
 
-Tools return a uniform shape:
+Every write tool takes a **finished** subject + body / payload. DocJacket does not call an LLM on its side. The customer is paying for your composition through their Claude / ChatGPT / Codex / Cowork / Gemini subscription; DocJacket gets one cheap API call per action.
+
+### What the result means
+
+Read `status` before you tell the user anything.
+
+| `status` | Meaning | Tell the user |
+|---|---|---|
+| `awaiting_confirmation` | An email send tool returned a `preview` and a `confirmCode` (starts `djc_`). NOTHING has been sent. | Show the COMPLETE preview, then ask. On an explicit yes call `confirm_email_send`; on no, call it with `decision: "discard"`. |
+| `parked_for_review` | The email has NOT been sent. It is waiting in the DocJacket review queue for a team member (the organization reviews AI-written emails, or something forced a review). No `confirmCode` is issued. | "It is waiting for approval in DocJacket, not sent yet." Give `reviewReason` (or `heldBecause`) in plain English if present. |
+| `already_approved` | A reviewer already approved a draft with this exact subject and recipient and it went out from the queue. Nothing new was sent. | Say that, and that a different subject is needed to send something new. |
+| `queued` | `confirm_email_send` approved the email and queued it to send. It has not left yet. | Report recipient and subject as approved and on its way. Only `get_held_email` with its `actionId` showing `state: "sent"` means it went out; `failed` means it did not. |
+| `discarded` | `confirm_email_send` with `decision: "discard"` removed the email from the review queue. | Say it was discarded and nothing was sent. |
+| `preview_pending_confirmation` | A calendar-invite tool returned a preview and a `confirmCode`. Nothing has gone out yet. | Show the attendees and dates. On an explicit yes, call the SAME tool again with the `confirmCode`. |
+| `created` / `updated` / `saved` | An internal write ran. | Report the one-line `summary`. |
 
 ```json
 {
-  "status":        "sent" | "created" | "updated" | "saved",
-  "transactionId": "uuid",
-  "summary":       "Email sent to Jane Doe (buyer) — subject: \"Weekly update\".",
-  "outcome":       "enqueued for jane@example.com via Gmail, outbox id=…",
-  …tool-specific fields…
+  "status":        "awaiting_confirmation",
+  "confirmCode":   "djc_...",
+  "expiresAt":     "2026-11-06T18:00:00Z",
+  "recipient":     "Jane Doe (jane@example.com)",
+  "preview":       { "to": [...], "cc": [...], "bcc": [...], "subject": "...", "bodyHtml": "...", "bodyText": "...", "attachments": [...] },
+  "summary":       "NOT sent yet. Show the user the complete email above ..."
 }
 ```
 
-Show the `summary` to the user inline. The action is already done — no review step needed.
+Show the `summary` to the user. For an email, the action is not done until `confirm_email_send` returns `queued` or a team member approves it.
 
 ## When to use which tool
 
@@ -61,6 +70,18 @@ Show the `summary` to the user inline. The action is already done — no review 
 | "Add a task to follow up on X" or "remind me to Y by Z" | `create_tasks` |
 | "Set a reminder for [X days] before [deadline]" or "nudge the agent before EMD" | `create_reminder` |
 | "Summarize this transaction for me" or "save a status recap on the deal" | `save_status_summary` |
+| "Mark that task done" | `complete_task` (taskId from `get_open_tasks`). If its result has `completionEmailsHeld: true`, the emails the task triggers are held, NOT sent (listed in `heldEmails`, or by `list_held_emails` when that is empty): never send them yourself, and do not render or send `triggeredEmailTemplates`; release each like a held email (below) or discard it |
+| "Change that task's title or notes" | `update_task` |
+| "Push that task to Friday" | `reschedule_task` |
+| "Give that task to Dana" | `reassign_task` |
+| "Delete these tasks" | `delete_tasks` |
+| "Change / cancel that reminder" | `update_reminder` / `cancel_reminder` (reminderId from `get_reminders`) |
+| "What reminders are set on this deal?" | `get_reminders` |
+| "Find / add / fix a contact; put them on this deal" | `search_contacts`, then `create_contact` only if none found, `update_contact`, `add_contact_to_transaction` |
+| "Put the walkthrough on my calendar" | `create_deal_calendar_event` (invites nobody) |
+| "Invite the lender and title rep to the inspection date" / "cancel those invites" | `send_key_date_invites` / `cancel_key_date_invites` |
+| "What would this Playbook add to the deal?" / "Apply it" / "Undo that" | `preview_playbook` / `apply_playbook` / `undo_playbook` |
+| "Set up a new Playbook for my team" | `start_playbook_draft`, `list_playbook_drafts`, `commit_playbook_draft`, `undo_playbook_setup` |
 
 Four calls to keep close:
 
@@ -74,13 +95,66 @@ Four calls to keep close:
 
 ## Confirm before you call
 
-Because there's no second approval step, you **must** confirm in chat before firing a `send_*` / `create_*` / `update_*` / `save_*` tool. Acceptable patterns:
+### Emails: preview, confirm, send
 
-- *"Here's the draft email to Jane: [subject + body]. Want me to send it?"* (user replies "yes" → call `send_client_update`)
-- *"I'll move the inspection deadline from May 25 to June 1 based on the amendment. Sound right?"* (user replies "yes" → call `update_key_date`)
-- *"I'll add a task: 'Follow up with lender about appraisal — due Friday.' OK?"* (user replies "yes" → call `create_tasks`)
+Compose the email, then call the `send_*` tool. It sends nothing. The recipient must be a contact already on the deal (`CONTACT_NOT_ON_DEAL` otherwise); add them with `add_contact_to_transaction` first, after the user agrees.
 
-If the user's instruction is unambiguous and self-contained (*"send the buyer the weekly update we just drafted"*), you can fire the tool without a separate confirmation turn. Use judgment.
+1. **`status: "awaiting_confirmation"`.** Show the user the COMPLETE email exactly as returned in `preview`: recipients (to, cc, bcc), subject, full body, attachments. Call `confirm_email_send` with the `confirmCode` ONLY after the user explicitly says yes to that preview. If they say no, call it with `decision: "discard"`. Never confirm on your own, on a vague reply, or on a yes given to an earlier draft: if the preview changed, show it again. A `confirmCode` works once, for 30 minutes, for the same user and connection, and for exactly the content previewed. An email nobody confirms waits in the DocJacket review queue.
+2. **`status: "parked_for_review"`.** The email has NOT been sent. It is waiting in the DocJacket review queue for a team member. Tell the user in plain words: "It is waiting for approval in DocJacket, not sent yet", and give `reviewReason` (or `heldBecause`) if present. Never say sent, delivered or done. There is no code to confirm and nothing more for you to call; do not call the send tool again to push it through. The organization's setting (`review_auto_emails_before_send`) decides between this path and the preview, and you cannot override it.
+3. **`confirm_email_send` returns `status: "queued"`** (approved and queued to send; `get_held_email` shows `sent` or `failed` once it is done) or `"discarded"`, or `"already_approved"` if a reviewer got there first. Report exactly that.
+
+**Releasing a held email.** Only some organizations let you release an email DocJacket is holding (`list_held_emails`). There, `prepare_held_email_approval` with its `actionId` prepares the release and sends nothing: `status: "awaiting_confirmation"` works exactly like step 1 (show the COMPLETE preview, confirm only on an explicit yes, `decision: "discard"` on a no). `status: "cannot_release"` means a blocking hold reason must be fixed first; tell the user what `holdReasons` says. `NOT_ENABLED` means the organization approves held emails in DocJacket; tell the user it is waiting there. A held email whose requested send time has passed (`requested_send_time_passed`, or `SEND_TIME_PASSED` from confirm) can only be rescheduled or sent now in DocJacket's web app: tell the user, and do not prepare it again.
+
+If `confirm_email_send` returns an error, read the code:
+
+| Code | What to do |
+|---|---|
+| `CONFIRM_CODE_EXPIRED`, `CONTENT_CHANGED`, `SUPERSEDED` | Call the send tool again for a fresh preview and show the whole new preview. (An older preview was replaced, the 30 minutes ran out, or the email changed since you previewed it.) |
+| `REVIEW_REQUIRED`, `NOT_ALLOWED_TO_CONFIRM`, `RECIPIENT_NOT_ALLOWED`, `NO_LONGER_PENDING` | Tell the user the email is waiting in the DocJacket review queue for a team member. Do not retry. |
+| `HOLD_NOT_CLEARED` | A held email gained a blocking hold reason after you prepared it. Nothing was sent; call `get_held_email` and tell the user what holds it. |
+| `CONFIRM_IN_PROGRESS` | Wait a moment and call `confirm_email_send` again with the same code. |
+| `CONFIRM_CODE_INVALID`, `CONFIRM_CODE_NOT_YOURS` | Check the code with the user, or call the send tool again for a fresh preview. |
+| `TRANSACTION_NOT_FOUND`, `CONFIRM_FAILED` | Tell the user it did not go out; the email stays in the review queue. |
+
+Calling `confirm_email_send` again with the same code returns the same answer and never sends twice.
+
+### Calendar invites
+
+Google emails every attendee, so these are preview-then-confirm.
+
+1. Call `send_key_date_invites` (or `cancel_key_date_invites`) with the deal, `keyDateIds` (from `get_key_dates`) and `attendeeContactIds` (contacts on the deal with an email who receive transaction updates).
+2. The first call sends nothing. It returns `status: "preview_pending_confirmation"` with the final attendees, dates and a one-time `confirmCode`. If the organization reviews outgoing messages it returns `parked_for_review` instead: tell the user it is waiting for approval.
+3. Show the user the preview exactly as returned. Only on an explicit yes, call the SAME tool again with that `confirmCode`. The code works once, for 30 minutes. If the user changes anything, call without the code to get a fresh preview.
+
+`create_deal_calendar_event` is different: it adds an event to the user's own calendar immediately and invites nobody. Confirm the details first.
+
+### Internal writes
+
+Confirm intent in chat before a `create_*` / `update_*` / `save_*` / `apply_*` call. Acceptable patterns:
+
+- *"I'll move the inspection deadline from May 25 to June 1 based on the amendment. Sound right?"* (user replies "yes" -> call `update_key_date`)
+- *"I'll add a task: 'Follow up with lender about appraisal — due Friday.' OK?"* (user replies "yes" -> call `create_tasks`)
+
+If the user's instruction is unambiguous and self-contained (*"move the inspection deadline to June 1"*), you can call the tool without a separate confirmation turn. Use judgment.
+
+`delete_tasks` is a hard delete with no undo. List the exact tasks (titles and deals) and get an explicit yes first, even when the user already asked for the deletion.
+
+## Retries and ids
+
+Send a request id on every write. Over MCP set the header `X-DocJacket-Client-Request-Id` to a fresh unique value per intended action (a UUID). If a call times out or you are unsure it landed, retry with the SAME id: DocJacket replays the first result instead of running the action twice. A new id means a new action. Over REST use `Idempotency-Key` the same way. Without the header a retry is not de-duplicated. If your client cannot set the header, call the matching read first (`get_open_tasks`, `get_reminders`, `get_key_dates`, `get_contacts`) and retry only what is missing. When you confirm a send (`confirm_email_send`) or a calendar invite, retrying the confirm with the same request id replays the first answer; an id that was already spent on a different action must be replaced with a new one.
+
+## Ids come from lookups
+
+Get every id from a lookup read; never guess or invent one, and never reuse an id from an earlier conversation without re-reading.
+
+- taskId: `get_open_tasks` (use `search` for words in the title; `scope: "org"` to search beyond one deal) or `get_checklist_status`.
+- contactId: `search_contacts`, `get_contacts`, `find_contact_by_email`.
+- keyDateId: `get_key_dates`.
+- reminderId: `get_reminders` (states: `sent`, `awaiting_review`, `held`, `scheduled`). `update_reminder` and `cancel_reminder` only work on reminders that have not gone out yet (`REMINDER_SENT` otherwise).
+- Playbook id: `list_playbooks`, then `get_playbook`.
+- transactionId: `search_transactions` or `find_transaction_by_property`.
+
+If a lookup returns several matches, show them and ask. If it returns none, say so; do not create a duplicate (`create_contact` only after `search_contacts` finds no match).
 
 ## Required upstream context
 
@@ -94,11 +168,13 @@ Before composing, gather what you need. The customer's mail-MCP (Gmail / Outlook
 3. get_key_dates({ transactionId })        — what's coming up
 4. get_open_tasks({ transactionId })       — what's still pending
 5. (compose subject + body inline using the above)
-6. (show user the draft, ask for confirmation)
+6. (show user the full draft, ask for confirmation)
 7. send_client_update({
      transactionId, audience: "buyer", focus: "weekly",
      recipientContactId, subject, bodyHtml, bodyPlainText
    })
+   → "awaiting_confirmation": show the full preview; on the user's yes, confirm_email_send({ confirmCode })
+   → "parked_for_review": tell the user it is waiting for approval in DocJacket
 ```
 
 ### Recipe — chase a missing document
@@ -134,7 +210,7 @@ User: "Remind the buyer's agent 2 days before EMD is due."
    })
 ```
 
-The reminder fires via DocJacket's Hangfire scheduler. It sends whether the chat is open or not — the TC sets it and forgets it. If the same `(deadlineType, daysBeforeReminder)` pair already has a reminder, the call returns `DUPLICATE_REMINDER` (idempotent).
+The reminder fires via DocJacket's Hangfire scheduler, whether the chat is open or not. It does not send on its own: when it comes due, its email waits in the DocJacket review queue until a team member approves it. Tell the TC to approve it there. "Scheduled" means it will wait for a team member's approval when due, not that the email goes out. If the same `(deadlineType, daysBeforeReminder)` pair already has a reminder, the call returns `DUPLICATE_REMINDER` (idempotent).
 
 For conditional "only nudge if they haven't already responded" logic, that's a Cowork Scheduled Task or Codex Automation that wraps `create_reminder` + a Gmail thread check — out of scope for the deterministic-server-side reminder.
 
@@ -178,7 +254,11 @@ DocJacket does not have an inbox-read tool. Your mail-MCP does.
 
 ## Anti-patterns (don't)
 
-- **Don't fire a `send_*` / `update_*` tool without an explicit user yes.** The chat is the gate. If the user said "draft an email" without saying "send it", show the draft and wait. If the user said "send the email", you can call the tool.
+- **Don't fire a `send_*` tool without an explicit user yes.** If the user said "draft an email" without saying "send it", show the draft and wait. Even after that yes, the send tool only previews or parks; `confirm_email_send` is what sends.
+
+- **Don't call `confirm_email_send` without the user's explicit yes to the full preview**, and don't say an email is on its way unless it returned `queued`. For `parked_for_review`, don't re-call the send tool to force it through.
+
+- **Don't guess ids.** Look them up (see Ids come from lookups).
 
 - **Don't paste full external email content into `bodyHtml` or `sourceContextSummary`.** Summarize upstream context in one or two sentences. Quoting the original message inline in the new body is fine; archiving someone else's inbox in our database is not.
 
@@ -188,32 +268,42 @@ DocJacket does not have an inbox-read tool. Your mail-MCP does.
 
 - **Don't compose without grounding.** A draft to "Sarah" with no transaction lookup gets details wrong. Always call at least `get_transaction` + `get_contacts` first — they're cheap.
 
-- **Don't say "Pending Review" or link `/prepared-work`.** That UI is retired. After a successful action, say "Done — sent to Jane" or "Done — moved the inspection deadline to June 1."
+- **Don't say "Pending Review" or link `/prepared-work`.** That UI is retired. After a preview, ask. After `parked_for_review`, say it is waiting for approval in DocJacket. After `confirm_email_send` returns `queued`, report it as approved and on its way. After an internal write, say "Done — moved the inspection deadline to June 1."
 
 ## Bundling
 
-If the user asks for "an email to the buyer AND a task to follow up Friday," that's two tool calls — `send_client_update` + `create_tasks`. Two confirmations (or one combined "Sound good?") before firing. Don't try to combine them in a single tool.
+If the user asks for "an email to the buyer AND a task to follow up Friday," that's two tool calls — `send_client_update` + `create_tasks`. Two confirmations (or one combined "Sound good?") before firing. Each email still gets its own preview and its own `confirm_email_send` call; the task half is done on call. One yes can authorise several previews only if the user saw every one. Don't try to combine them in a single tool.
 
 ## Output to the user
 
-After a successful tool call:
+After an internal write:
 
 ```
-✅ <summary>
+Done: <summary>
 
 You can see this on the transaction's activity feed.
 ```
 
-For emails specifically, mention the recipient + subject so the user has a clear record of what just went out from their account:
+After an email preview (status `awaiting_confirmation`): show the whole email and ask "Send this?" Nothing has gone out.
+
+After an email is parked (status `parked_for_review`), mention the recipient and subject and say plainly that nothing has gone out yet:
 
 ```
-✅ Email sent to Jane Doe (jane@example.com)
+Waiting for approval in DocJacket, not sent yet.
+   To: Jane Doe (jane@example.com)
+   Subject: "Weekly update — 8824 Clear View St."
+```
+
+Only after `confirm_email_send` returns `queued`:
+
+```
+Approved and on its way to Jane Doe (jane@example.com)
    Subject: "Weekly update — 8824 Clear View St."
 ```
 
 ## Send mode is decided by the org
 
-When the customer's org is in **user-mailbox mode** (Option C), `send_*` tools route the email through the user's connected Gmail or Outlook account. The email leaves from the customer's actual address. Otherwise, the email goes via Postmark with the customer's brand. You don't control this — it's an org setting. If a `send_*` call fails because the user has user-mailbox mode but hasn't connected a mailbox, surface the error message and point them at Settings → Integrations.
+When the customer's org is in **user-mailbox mode** (Option C), an approved email leaves through the user's connected Gmail or Outlook account, so it comes from their actual address. Otherwise it goes via Postmark with the customer's brand. You don't control this. The organization's `review_auto_emails_before_send` setting decides whether an AI-written email waits for a team member (`parked_for_review`) or comes back as a preview for the user to confirm (`awaiting_confirmation`). If a confirmed send fails because the user has user-mailbox mode but hasn't connected a mailbox, point them at Settings -> Integrations.
 
 ## Migration from the old `prepare_*` / `propose_*` / `draft_*` tools
 

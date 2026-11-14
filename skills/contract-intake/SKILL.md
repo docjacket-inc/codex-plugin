@@ -1,30 +1,31 @@
 ---
 name: contract-intake
-title: Intake a contract PDF and build a complete transaction in one conversation
-purpose: Walk a TC from "I just got a signed contract" to "the deal is fully set up in DocJacket" without leaving the chat — extract, review, apply, schedule, confirm.
-applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
-tools_used:
-  - list_documents
-  - extract_existing_document
-  - request_upload_url
-  - kick_off_extraction
-  - upload_document_for_extraction
-  - get_extraction_results
-  - apply_extraction
-  - add_key_dates_batch
-  - apply_checklist
-  - create_reminder
-  - get_intake_status
-  - render_email_template
-  - send_email_to_agent
-  - send_client_update
-  - get_portal_link
-expected_output: A new transaction in DocJacket with parties, key dates, a checklist, intro emails sent, reminders scheduled, and a portal link the TC can share. The TC never opened the web app.
-required_scopes: [actions]
-version: 1.0.0
+description: >-
+  Walks a TC from a signed contract PDF to a fully set-up DocJacket transaction without leaving
+  the chat: extract, review, apply, schedule, confirm. The result is a new transaction with
+  parties, key dates, a checklist, intro emails previewed and confirmed (or waiting for a team
+  member's approval), reminders scheduled, and a portal link the TC can share. Use when the TC has
+  a new signed contract to intake or asks to build a deal from a contract.
+license: MIT
+metadata:
+  docjacket-title: "Intake a contract PDF and build a complete transaction in one conversation"
+  docjacket-tools: "list_documents extract_existing_document request_upload_url kick_off_extraction upload_document_for_extraction get_extraction_results apply_extraction create_transaction add_key_dates_batch apply_checklist create_reminder get_intake_status render_email_template send_email_to_agent send_client_update confirm_email_send search_contacts create_contact add_contact_to_transaction create_deal_calendar_event send_key_date_invites preview_playbook apply_playbook get_portal_link"
+  docjacket-scopes: "actions"
+  docjacket-version: "1.1.0"
 ---
 
 # Contract Intake
+
+## No document? Use `create_transaction`
+
+If the user wants a deal opened with **no contract to read** — "set up blank listings for units 1-4 at 412 Harbor View", a list of addresses from a spreadsheet or screenshot — skip extraction entirely and call `create_transaction`:
+
+1. Build the list (street, unit, city, state, zip, type — default `Listing` — side, optional status/price/agent).
+2. **Show the user the exact list and get a yes.** The deals are created the moment you call.
+3. Call `create_transaction({ transactions: [...] })` — at most 25 per call.
+4. Report each item back: `created` (new `transactionId`), `skipped_duplicate` (the deal already exists — `existingTransactionId`), or `error`. A repeat call is safe: already-created deals come back as `skipped_duplicate`.
+
+A matching Playbook is auto-applied exactly as `apply_extraction` does.
 
 ## When this fires
 
@@ -46,7 +47,7 @@ The flow has five phases. Each ends with the LLM confirming the result before th
 
 There are three paths. Pick by where the PDF is and what the MCP client supports.
 
-**Path A — Already in DocJacket (canonical, prefer this).** The TC uploaded the PDF earlier via DocDrop, email intake, the web wizard, or a prior chat call. No bytes move; DocJacket already has them. Works in every MCP client (Cowork, Codex, ChatGPT, Claude.ai free or paid, Gemini).
+**Path A — Already in DocJacket (canonical, try this first).** The TC uploaded the PDF earlier via DocDrop, email intake, the web wizard, or a prior chat call. No bytes move; DocJacket already has them. Works in every MCP client (Cowork, Codex, ChatGPT, Claude.ai free or paid, Gemini).
 
 ```
 1a. list_documents({ hasExtraction: false, limit: 20 })   // discovery
@@ -65,7 +66,9 @@ There are three paths. Pick by where the PDF is and what the MCP client supports
 
 When the TC says "extract the contract I uploaded last night" or "process the file from this morning," this is the path. Always call `list_documents` first to surface candidates rather than guessing.
 
-**Path B — Attached to chat, Claude.ai paid + code execution.** TC drops a PDF directly in chat that isn't in DocJacket yet. Two-step presigned upload: bytes go from the LLM's sandbox to blob storage via curl, never touching chat tokens.
+**Path B — Not in DocJacket yet: email it (default in every client).** Ask the user to email or forward the PDF, from their own email address, to their new-deal address: `get_organization_summary` → `intake_addresses.new_deal.address`. Email from anyone else waits in the Review Queue. Then poll `list_new_deal_intake` to see what became of it. No bytes pass through chat, and it needs no paid plan or code execution.
+
+**Path C — Attached to chat, code sandbox that can reach `uploadHost`.** TC drops a PDF directly in chat that isn't in DocJacket yet. Two-step presigned upload: bytes go from the LLM's sandbox to blob storage via curl, never touching chat tokens.
 
 ```
 2a. request_upload_url({ filename: "contract.pdf" })
@@ -73,16 +76,16 @@ When the TC says "extract the contract I uploaded last night" or "process the fi
 
 2b. (In the code-execution sandbox:)
     bash> curl -X PUT -T /mnt/user-data/uploads/contract.pdf \
-            -H "x-ms-blob-type: BlockBlob" -H "Content-Type: application/pdf" \
+            -H "Content-Type: application/pdf" \
             "<uploadUrl>"
 
 2c. kick_off_extraction({ uploadId, filename, state?, side?, documentTypeHint? })
     → { extractionJobId, status: "queued", estimatedSecondsToComplete, cacheHit }
 ```
 
-Requires a paid Claude.ai plan with code execution enabled AND `mcp.docjacket.com` added under Settings → Capabilities → Code execution → Additional allowed domains. If 2b returns a 403 / DNS error, the user almost certainly missed the domain whitelist — surface that with a link to https://help.docjacket.com/docs/ai-access/setup and fall back to Path C.
+Requires a code-execution sandbox whose network allowlist includes the host returned as `uploadHost` (an R2 storage host, not mcp.docjacket.com). If 2b fails with a 403 / network / DNS error, the sandbox cannot reach `uploadHost` — stop and use Path B (email) instead; do not retry.
 
-**Path C — Attached to chat, anywhere else (fallback).** Tiny PDFs (~under 1 MB) attached to chat with no other option. Bytes ride in chat context for the rest of the conversation; compounds with later turns, so only use when paths A and B don't apply.
+**Path D — Attached to chat, anywhere else (last resort).** Tiny PDFs (~under 1 MB) attached to chat with no other option. Bytes ride in chat context for the rest of the conversation; compounds with later turns, so only use when paths A, B and C don't apply.
 
 ```
 3. upload_document_for_extraction({ fileBase64, filename, state?, side?, documentTypeHint? })
@@ -187,7 +190,7 @@ Then send the intro emails. Use `render_email_template` FIRST to show the TC dra
    → { subject, bodyHtml, unresolvedFields: [] }
 ```
 
-Present both drafts to the TC. On approval:
+Present both drafts to the TC. On approval, call the send tools. Nothing is sent by these calls. Each returns either `status: "awaiting_confirmation"` with a `preview` and `confirmCode`, or `status: "parked_for_review"` (waiting for a team member in the DocJacket review queue; a normal outcome, not an error). For each `awaiting_confirmation`, show the TC the complete preview and call `confirm_email_send` with the code only on their explicit yes (`decision: "discard"` on no). Never tell the TC an intro is on its way unless `confirm_email_send` returned `queued`. Details and error codes are in `execution-workflow`:
 
 ```
 9.  send_client_update({ transactionId, audience: "buyer", ... })
@@ -209,7 +212,7 @@ If the TC says "set up the standard reminders" or "remind the agent before EMD":
     → { reminderId, scheduledForUtc, summary }
 ```
 
-Reminders fire via DocJacket's Hangfire scheduler — they go out whether the chat is open or not. The TC can set them and forget them.
+Reminders fire via DocJacket's Hangfire scheduler, whether the chat is open or not. A reminder created here does not send on its own: when it comes due, its email waits in the DocJacket review queue until a team member approves it. Tell the TC to approve it there.
 
 ### Phase 5 — Confirm + share portal
 
@@ -232,7 +235,7 @@ Show the TC the final summary:
    • 4 contacts linked (buyer, seller, both agents)
    • 7 key dates scheduled
    • 24 checklist tasks applied (Florida Buyer Purchase)
-   • 2 intro emails sent
+   • 2 intro emails approved and on their way (or: waiting for approval in DocJacket, not sent yet)
    • 2 reminders scheduled (EMD nudge for buyer's agent + TC)
    • Portal link: <url>
 ```
@@ -251,7 +254,7 @@ The response's `missingRecommendedSteps[]` tells you exactly what to retry:
 |---|---|
 | `no_checklist_applied` | `apply_checklist` |
 | `no_closing_date` / `no_inspection_deadline` | `add_key_dates_batch` |
-| `no_buyer_agent` / `no_listing_agent` / `no_title_company` | `add_contact_to_transaction` |
+| `no_buyer_agent` / `no_listing_agent` / `no_title_company` | `search_contacts` first; `add_contact_to_transaction` if found, `create_contact` then `add_contact_to_transaction` if not |
 | `no_reminders_scheduled` | `create_reminder` |
 
 If the conversation resumes on a different surface (TC switched from Claude iOS to Claude Desktop, or moved to Codex), the `transactionId` is your durable handle. Use `search_transactions` or `find_transaction_by_property` to re-locate, then `get_intake_status` to re-orient.
@@ -263,7 +266,9 @@ If the conversation resumes on a different surface (TC switched from Claude iOS 
 - **`create_reminder`** dedups on `(deadlineType, daysBeforeReminder)` per transaction; duplicate call returns `DUPLICATE_REMINDER`.
 - **`add_key_dates_batch`** doesn't dedup at the batch level but each row is idempotent — re-adding the same `keyDateType` updates the existing slot.
 
-So retries are safe across all the write tools. If you suspect a partial-failure state, call `get_intake_status` first and only retry the specific gaps.
+- **Request ids.** Send a request id on every write: over MCP set the header `X-DocJacket-Client-Request-Id` to a fresh UUID per intended action, and if a call times out retry with the SAME id so DocJacket replays the first result instead of acting twice. A new id means a new action. Details in `execution-workflow` (Retries and ids). If your client cannot set the header, rely on the natural-key dedup above.
+
+If you suspect a partial-failure state, call `get_intake_status` first and only retry the specific gaps. Get contact, key date and task ids from lookup reads (`search_contacts`, `get_key_dates`, `get_open_tasks`); never guess them.
 
 ## Anti-patterns (don't)
 
@@ -285,15 +290,21 @@ If a TC's prior workflow was the web app's upload wizard, this chat flow lands t
 |---|---|---|
 | `list_documents` | Read / `documents:read` | Phase 1a — Path A — find docs already in DocJacket |
 | `extract_existing_document` | Actions / `upload_document` | Phase 1c — Path A — canonical: extract a doc already in DocJacket |
-| `request_upload_url` | Actions / `upload_document` | Phase 2a — Path B — Claude.ai paid + code execution only |
-| `kick_off_extraction` | Actions / `upload_document` | Phase 2c — Path B — start pipeline after sandbox PUT |
-| `upload_document_for_extraction` | Actions / `upload_document` | Phase 3 — Path C — base64 fallback for tiny chat-attached PDFs |
+| `request_upload_url` | Actions / `upload_document` | Phase 2a — Path C — code sandbox that can reach uploadHost only |
+| `kick_off_extraction` | Actions / `upload_document` | Phase 2c — Path C — start pipeline after sandbox PUT |
+| `upload_document_for_extraction` | Actions / `upload_document` | Phase 3 — Path D — base64 last resort for tiny chat-attached PDFs |
 | `get_extraction_results` | Read / `documents:read` | Phase 2 — poll for completion |
 | `apply_extraction` | Actions / `transactions:create` | Phase 3 — confirm and create the transaction |
+| `create_transaction` | Actions / `transactions:create` | No-document path — blank deals from an address list (1-25) |
 | `add_key_dates_batch` | Draft / `key_dates:propose` | Phase 4 — batch-add timeline dates |
 | `apply_checklist` | Draft / `prepared_work:create` | Phase 4 (rare) — swap or add a checklist |
 | `render_email_template` | Read / `emails:prepare` | Phase 4 — preview drafts before send |
-| `send_client_update` / `send_email_to_agent` | Actions / `send_email` | Phase 4 — send intros |
+| `send_client_update` / `send_email_to_agent` | Actions / `send_email` | Phase 4 — preview the intros (nothing is sent by the call) |
+| `confirm_email_send` | Actions | Phase 4 — send (or discard) a previewed intro, only after the TC's explicit yes |
+| `search_contacts` / `create_contact` / `add_contact_to_transaction` | Read / Draft | Phase 4 / recovery — find, create only if none found, link to the deal |
+| `create_deal_calendar_event` | Draft | Optional — closing or walkthrough on the TC's calendar (invites nobody) |
+| `send_key_date_invites` | Actions | Optional — calendar invites to deal contacts; preview first, then confirm with the `confirmCode` |
+| `preview_playbook` / `apply_playbook` | Read / Draft | Optional — preview then apply a Playbook to the deal |
 | `create_reminder` | Actions / `reminders:create` | Phase 4 — schedule durable nudges |
 | `get_intake_status` | Read / `transactions:read` | Phase 5 / recovery — final check or re-orientation |
 | `get_portal_link` | Read / `transactions:read` | Phase 5 — share with parties |

@@ -1,18 +1,16 @@
-<!--
-  Generated from plugins/shared/skills/dj-cli.md — do not hand-edit.
-  Update the canonical file and re-sync. See plugins/README.md for the rule.
-  Generator: hand-curated v1 (per spec §3.3). Last sync: 2026-09-24.
--->
-
 ---
 name: dj-cli
-title: Use DocJacket from a shell with the dj CLI
-purpose: Read DocJacket transactions, deadlines, tasks, documents and contacts through the `dj` command-line tool when the agent has a shell. Chat clients without a shell use the DocJacket MCP tools instead.
-applicable_to: [claude-code, codex, cowork]
-tools_used: [dj]
-expected_output: Answers grounded in dj's JSON output, with transaction ids carried between commands.
-required_scopes: [read]
-version: 0.1.1
+description: >-
+  Reads DocJacket transactions, deadlines, tasks, documents and contacts through the `dj`
+  command-line tool when the agent has a shell, answering from dj's JSON output and carrying
+  transaction ids between commands. Use when the agent can run shell commands and the user asks
+  about their DocJacket data. Chat clients without a shell use the DocJacket MCP tools instead.
+license: MIT
+metadata:
+  docjacket-title: "Use DocJacket from a shell with the dj CLI"
+  docjacket-tools: "dj"
+  docjacket-scopes: "read"
+  docjacket-version: "0.1.1"
 ---
 
 # DocJacket via the `dj` CLI

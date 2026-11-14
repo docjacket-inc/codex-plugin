@@ -2,10 +2,10 @@
   "$schema": "https://schemas.openai.com/codex/plugin-marketplace.v1.json",
   "name": "docjacket",
   "displayName": "DocJacket — TC Operating System",
-  "description": "Connect your DocJacket transactions, tasks, deadlines, contacts, and contingencies to Codex. v0.7 adds the contact-management skill — look up, create, and link the people on a deal, including adding a custom contact role in-chat when nothing existing fits. The chat is the approval gate — you confirm in conversation, DocJacket executes immediately. Paste-URL-and-go install via OAuth 2.1 + DCR. Call `mcp_catalog` after install for the live tool inventory.",
+  "description": "Connect your DocJacket transactions, tasks, key dates, documents and contacts to Codex and ChatGPT. Ten skills; OAuth sign-in, no token to paste. Call mcp_catalog for the live tool list.",
   "publisher": "DocJacket",
-  "homepage": "https://docjacket.com/mcp",
-  "documentation": "https://docs.docjacket.com/mcp/codex",
+  "homepage": "https://www.docjacket.com/mcp",
+  "documentation": "https://help.docjacket.com/docs/mcp/codex",
   "plugins": [
     {
       "name": "docjacket",
@@ -15,7 +15,7 @@
       },
       "interface": {
         "displayName": "DocJacket",
-        "description": "Full read + send tool suite for DocJacket transactions, plus seven workflow skills (TC context, daily triage, execution workflow, email triage, document filing, follow-up drafting, closing prep). Call mcp_catalog after install for the live tool inventory. The chat is the approval gate."
+        "description": "Ten workflow skills for DocJacket transactions: contract intake, inbox triage, document filing, morning briefings, closing prep, follow-ups, contacts and the dj CLI. Call mcp_catalog after install for the live tool inventory."
       }
     }
   ]

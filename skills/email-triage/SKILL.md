@@ -1,25 +1,17 @@
-<!--
-  Generated from plugins/shared/skills/email-triage.md — do not hand-edit.
-  Update the canonical file and re-sync. See plugins/README.md for the rule.
-  Generator: hand-curated v1 (per spec §3.3). Last sync: 2026-05-19.
--->
-
 ---
 name: email-triage
-title: Match Gmail / Outlook emails to DocJacket transactions and identify required actions
-purpose: Cross-reference the TC's inbox against active deals, group matched email by transaction, and surface what needs the TC's attention.
-applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
-tools_used:
-  - list_active_transactions
-  - find_contact_by_email
-  - search_transactions
-  - classify_document
-  - get_missing_documents
-  - get_checklist_status
-  - get_upcoming_key_dates
-expected_output: A per-transaction briefing grouping matched email + attachments + deadline proximity, with explicit asks for TC decisions.
-required_scopes: [read]
-version: 1.0.0
+description: >-
+  Cross-references the TC's Gmail or Outlook inbox against active DocJacket deals, groups matched
+  email by transaction, and surfaces what needs the TC's attention as a per-transaction briefing
+  of matched email, attachments and deadline proximity, with explicit asks for the TC's decisions.
+  Use when the TC asks to triage their inbox, match emails to deals, or find which deal an email
+  belongs to.
+license: MIT
+metadata:
+  docjacket-title: "Match Gmail / Outlook emails to DocJacket transactions and identify required actions"
+  docjacket-tools: "list_active_transactions find_contact_by_email search_transactions classify_document get_missing_documents get_checklist_status get_upcoming_key_dates"
+  docjacket-scopes: "read"
+  docjacket-version: "1.0.0"
 ---
 
 # Email-to-Transaction Triage
@@ -110,7 +102,7 @@ The `execution-workflow` skill handles the action layer. Use:
 - **Group by transaction**, not chronologically.
 - **Mention deadline proximity** for any deal with key dates in the next 7 days.
 - **One ask per deal when possible.** Don't make the TC answer five questions for one deal.
-- **Confirm before any `send_*` / `create_*` / `update_*` call** — per `execution-workflow`, the chat is the approval gate. _"Want me to send it?"_ → wait for yes → fire.
+- **Confirm before any `send_*` / `create_*` / `update_*` call** — per `execution-workflow`. _"Want me to send it?"_ → wait for yes → call. A `send_*` call only previews: show the full preview and call `confirm_email_send` on the user's explicit yes. If it comes back `parked_for_review`, report it as waiting for approval in DocJacket, not sent.
 
 ## Don't do
 

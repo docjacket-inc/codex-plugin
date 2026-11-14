@@ -1,28 +1,17 @@
-<!--
-  Generated from plugins/shared/skills/closing-prep.md — do not hand-edit.
-  Update the canonical file and re-sync. See plugins/README.md for the rule.
-  Generator: hand-curated v1 (per spec §3.3). Last sync: 2026-05-19.
--->
-
 ---
 name: closing-prep
-title: Run a pre-closing checklist for a transaction and surface what's missing or at risk
-purpose: Walk the standard pre-closing checks against a transaction and report what's done, what needs attention, and what's missing — so the TC arrives at closing day with no surprises.
-applicable_to: [claude-desktop, codex, cowork, chatgpt, gemini]
-tools_used:
-  - get_transaction
-  - get_key_dates
-  - get_missing_documents
-  - get_checklist_status
-  - list_open_contingencies
-  - get_open_tasks
-  - find_contact_by_email
-  - send_document_request
-  - send_agent_followup
-  - create_tasks
-expected_output: A structured pre-closing report grouped by status (complete / needs attention / overdue), with offers to send follow-ups or create tasks for any gaps.
-required_scopes: [read, draft]
-version: 1.0.0
+description: >-
+  Walks the standard pre-closing checks against a DocJacket transaction and reports what is done,
+  what needs attention and what is missing, so the TC arrives at closing day with no surprises.
+  Produces a pre-closing report grouped by status (complete / needs attention / overdue) and
+  offers to send follow-ups or create tasks for any gaps. Use when the TC asks for a closing-prep
+  check, a pre-closing review, or what is still open before a deal closes.
+license: MIT
+metadata:
+  docjacket-title: "Run a pre-closing checklist for a transaction and surface what's missing or at risk"
+  docjacket-tools: "get_transaction get_key_dates get_missing_documents get_checklist_status list_open_contingencies get_open_tasks find_contact_by_email send_document_request send_agent_followup create_tasks"
+  docjacket-scopes: "read draft"
+  docjacket-version: "1.0.0"
 ---
 
 # Closing Preparation
@@ -95,12 +84,12 @@ Bundle related actions:
 
 > _"Want me to send chases for the HOA estoppel + loan letter + survey? Three emails, one confirmation."_
 
-On user yes, fire:
+On user yes, call:
 - **`send_document_request`** for each missing-doc chase (one call per recipient — bundle items going to the same person into one email)
 - **`send_agent_followup`** for non-doc-specific follow-ups (e.g. asking the agent about a contingency status)
 - **`create_tasks`** for items the TC wants to track but not chase yet
 
-Per `execution-workflow`, **one confirmation can authorize multiple bundled calls** — but only if the user clearly said yes to the bundle. If unclear, confirm each.
+Per `execution-workflow`, **one confirmation can authorize multiple bundled calls** — but only if the user saw every draft and clearly said yes to the bundle. If unclear, confirm each. Each email still gets its own preview and its own `confirm_email_send` call; an email that comes back `parked_for_review` is waiting for approval in DocJacket, not sent.
 
 ## State-specific awareness
 
@@ -114,4 +103,4 @@ Treat the checklist above as the universal floor. If the user's brokerage / stat
 - **Don't claim a contingency is released without checking.** Use `list_open_contingencies`.
 - **Don't bury done items.** Only call out completed items if they're compliance-relevant (CD timing) or the user asked for a full report.
 - **Don't recommend actions that need a signature or wire transfer.** Users make those calls; you surface the gap.
-- **Don't fire `send_*` / `create_*` without an explicit user yes** — per `execution-workflow`. Bundle confirmations when sensible.
+- **Don't call `send_*` / `create_*` without an explicit user yes** — per `execution-workflow`. Bundle confirmations when sensible. Don't say an email is on its way unless `confirm_email_send` returned `queued`.
