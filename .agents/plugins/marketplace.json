@@ -1,9 +1,9 @@
 {
   "$schema": "https://schemas.openai.com/codex/plugin-marketplace.v1.json",
   "name": "docjacket",
-  "displayName": "DocJacket — TC Operating System",
+  "displayName": "DocJacket",
   "description": "Connect your DocJacket transactions, tasks, key dates, documents and contacts to Codex and ChatGPT. Ten skills; OAuth sign-in, no token to paste. Call mcp_catalog for the live tool list.",
-  "publisher": "DocJacket",
+  "publisher": "DocJacket Software Inc",
   "homepage": "https://www.docjacket.com/mcp",
   "documentation": "https://help.docjacket.com/docs/mcp/codex",
   "plugins": [

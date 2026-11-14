@@ -4,10 +4,6 @@
     "docjacket": {
       "type": "streamable-http",
       "url": "https://mcp.docjacket.com/mcp",
-      "headers": {
-        "X-DocJacket-Source-App": "codex",
-        "X-DocJacket-Plugin-Version": "0.8.0"
-      },
       "extensions": {
         "com.openai": {
           "auth": {
@@ -15,7 +11,11 @@
             "client": {
               "mode": "dcr"
             },
-            "baseScopes": ["read", "draft", "actions"]
+            "baseScopes": [
+              "read",
+              "draft",
+              "actions"
+            ]
           }
         }
       }

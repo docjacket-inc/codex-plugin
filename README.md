@@ -5,7 +5,7 @@
 # DocJacket — Transaction Coordination plugin for Codex
 
 [![Plugin](https://img.shields.io/badge/Codex-plugin-purple)]()
-[![Version](https://img.shields.io/badge/version-0.8.0-green)]()
+[![Version](https://img.shields.io/badge/version-0.8.1-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
 Connect DocJacket transactions, tasks, deadlines, contacts, and document checklists to OpenAI Codex. Triage your pipeline, draft and send follow-up emails from your connected Gmail, classify inbound attachments against the right deal — all from inside Codex.
@@ -36,7 +36,7 @@ Selected highlights — for the **live and complete** list with per-tool gotchas
 
 ### Prerequisites
 
-A DocJacket account on the **Pro plan**. Connecting is free; loading tools requires Pro.
+A DocJacket account on any plan. MCP access (AI Access) is included with every DocJacket plan. On Free it is limited to 100 MCP calls per month, with limited data extractions.
 
 ### Codex CLI / Codex for Work
 
@@ -76,7 +76,7 @@ The MCP icon should show `docjacket` connected. Run `mcp_catalog` for the curren
 
 ## How attribution + revocation work
 
-Every call carries `X-DocJacket-Source-App: codex` + `X-DocJacket-Plugin-Version: 0.8.0`. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
+DocJacket records which app made each call from the OAuth client it signed in with and, for Codex, the Codex client version in its requests. The plugin sends no custom headers. Audit in [Activity Log](https://app.docjacket.com/settings/ai-access/activity). Revoke any connected OAuth client from `/settings/ai-access` without affecting other AI assistants.
 
 ## Optional connectors
 
@@ -87,6 +87,8 @@ See [`CONNECTORS.md`](CONNECTORS.md) — Gmail / Calendar / Drive / Slack compos
 This plugin does NOT provide legal advice. See [`DISCLAIMER.md`](DISCLAIMER.md) for the full scope and limitations.
 
 ## Version
+
+`0.8.1` (2026-11-14) — Listing fixes for the OpenAI directory: homepage and website link point at https://www.docjacket.com/mcp (the old docjacket.com/ai-access link was a 404); support, privacy and terms links added to the listing; `mcp.json` no longer sends custom headers (OpenAI public submission rejects them; OAuth sign-in is unchanged); MCP access is included with every DocJacket plan (Free: 100 MCP calls per month).
 
 `0.8.0` (2026-11-14) — portable `plugin.json` and `mcp.json`; all ten skills as valid Agent Skills under `skills/<name>/SKILL.md`; OAuth sign-in replaces the pasted bearer token; `.app.json` removed.
 

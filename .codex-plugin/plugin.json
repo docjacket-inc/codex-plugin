@@ -1,30 +1,40 @@
 {
   "name": "docjacket",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Connect your DocJacket transactions, tasks, deadlines, contacts, and contingencies to Codex and ChatGPT. Ten skills cover contract intake, inbox triage, document filing, morning briefings, closing prep, follow-ups and contacts. Every email is shown to you in full and goes out only after you say yes (or after a team member approves it in DocJacket, if your organization reviews emails); tasks, dates and contacts update right away. Sign in to DocJacket over OAuth when you install; no token to paste. Call `mcp_catalog` after install for the live tool inventory.",
   "author": {
-    "name": "DocJacket",
+    "name": "DocJacket Software Inc",
     "email": "support@docjacket.com",
     "url": "https://docjacket.com"
   },
-  "homepage": "https://docjacket.com/ai-access",
+  "homepage": "https://www.docjacket.com/mcp",
   "license": "MIT",
-  "keywords": ["real-estate", "transaction-management", "productivity"],
+  "keywords": [
+    "real-estate",
+    "transaction-management",
+    "productivity"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "DocJacket",
     "shortDescription": "Run your deals from chat",
     "longDescription": "DocJacket is a transaction coordination system for real-estate deals. This plugin connects your DocJacket transactions, tasks, key dates, documents and contacts to Codex and ChatGPT, with ten skills for contract intake, inbox triage, document filing, morning briefings, closing prep, follow-ups and contacts. Emails are shown to you and go out only after you say yes, or wait for a team member's approval if your organization reviews emails. A Viewer gets read-only access; a member limited to their own deals cannot connect.",
-    "developerName": "DocJacket",
+    "developerName": "DocJacket Software Inc",
     "category": "Productivity",
-    "capabilities": ["Read", "Write"],
-    "websiteURL": "https://docjacket.com/ai-access",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://www.docjacket.com/mcp",
     "defaultPrompt": [
       "Use DocJacket to brief me on what needs attention this morning.",
       "Use DocJacket to triage my inbox against my active deals.",
       "Use DocJacket to intake this contract PDF and build the deal."
     ],
     "composerIcon": "./assets/icon.png",
-    "logo": "./assets/icon.png"
+    "logo": "./assets/logo-mark-512.png",
+    "supportURL": "https://www.docjacket.com/contact",
+    "privacyPolicyURL": "https://www.docjacket.com/privacy",
+    "termsOfServiceURL": "https://www.docjacket.com/terms"
   }
 }
