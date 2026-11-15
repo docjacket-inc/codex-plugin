@@ -1,16 +1,14 @@
 ---
 name: contact-management
-description: >-
-  Manages DocJacket contacts and links them to transactions: search, get, create and link. Use
-  when the TC mentions contacts, parties, adding someone to a transaction, looking up an agent /
-  lender / inspector / title company, or when a new party needs to be added during intake or email
-  triage.
+description: "Manages DocJacket contacts and links them to transactions: search, get, create and link. Use when the TC mentions contacts, parties, adding someone to a transaction, looking up an agent / lender / inspector / title company, or when a new party needs to be added during intake or email triage."
 license: MIT
-metadata:
-  docjacket-title: "Manage DocJacket contacts and link them to transactions"
-  docjacket-tools: "search_contacts get_contact get_contacts find_contact_by_email create_contact create_contact_role add_contact_to_transaction search_transactions find_transaction_by_property render_email_template"
-  docjacket-scopes: "read actions"
 ---
+
+<!--
+docjacket-title: Manage DocJacket contacts and link them to transactions
+docjacket-tools: search_contacts get_contacts find_contact_by_email create_contact create_contact_role add_contact_to_transaction search_transactions find_transaction_by_property render_email_template
+docjacket-scopes: read actions
+-->
 
 # Contact Management
 
@@ -26,8 +24,9 @@ flows below. Never duplicate a contact — always search first. Get every `conta
   `find_contact_by_email(email: "...")`. Use this first when matching an
   inbound email to a transaction.
 - **Full detail** (after you have a `contactId`):
-  `get_contact(contactId: "...")`. Returns identity, address, license, every
-  active transaction the contact is a party on, and a recent activity timeline.
+  `search_contacts(contactId: "...")`. The `contact` field has identity,
+  address, license, every active transaction the contact is a party on, and a
+  recent activity timeline (`activityLimit`, default 25).
 
 ## Adding a new contact
 
@@ -122,7 +121,7 @@ When an unknown sender appears:
 
 When drafting a templated email (`render_email_template`), the contact's
 `company`, `licenseNumber`, and role on the transaction influence tone.
-Pull `get_contact` for the recipient before drafting so the merge fields
+Pull `search_contacts(contactId: "...")` for the recipient before drafting so the merge fields
 have everything available.
 
 ## Errors you should expect

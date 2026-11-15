@@ -1,16 +1,14 @@
 ---
 name: tc-context
-description: >-
-  Grounds the agent in real-estate transaction-coordinator terminology, the DocJacket object
-  model, and the safety rules that apply to every action taken on a transaction. Internal context
-  that fires alongside other skills and produces no output of its own. Use whenever working with
-  DocJacket transactions or when TC vocabulary comes up.
+description: Grounds the agent in real-estate transaction-coordinator terminology, the DocJacket object model, and the safety rules that apply to every action taken on a transaction. Internal context that fires alongside other skills and produces no output of its own. Use whenever working with DocJacket transactions or when TC vocabulary comes up.
 license: MIT
-metadata:
-  docjacket-title: "Transaction Coordinator vocabulary and DocJacket data model"
-  docjacket-scopes: "read"
-  docjacket-version: "1.1.0"
 ---
+
+<!--
+docjacket-title: Transaction Coordinator vocabulary and DocJacket data model
+docjacket-scopes: read
+docjacket-version: 1.1.0
+-->
 
 # Transaction Coordinator Context
 

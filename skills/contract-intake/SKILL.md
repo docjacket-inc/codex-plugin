@@ -1,18 +1,15 @@
 ---
 name: contract-intake
-description: >-
-  Walks a TC from a signed contract PDF to a fully set-up DocJacket transaction without leaving
-  the chat: extract, review, apply, schedule, confirm. The result is a new transaction with
-  parties, key dates, a checklist, intro emails previewed and confirmed (or waiting for a team
-  member's approval), reminders scheduled, and a portal link the TC can share. Use when the TC has
-  a new signed contract to intake or asks to build a deal from a contract.
+description: "Walks a TC from a signed contract PDF to a fully set-up DocJacket transaction without leaving the chat: extract, review, apply, schedule, confirm. The result is a new transaction with parties, key dates, a checklist, intro emails previewed and confirmed (or waiting for a team member's approval), reminders scheduled, and a portal link the TC can share. Use when the TC has a new signed contract to intake or asks to build a deal from a contract."
 license: MIT
-metadata:
-  docjacket-title: "Intake a contract PDF and build a complete transaction in one conversation"
-  docjacket-tools: "list_documents extract_existing_document create_upload_link get_upload_link_status list_new_deal_intake request_upload_url kick_off_extraction upload_document_for_extraction get_extraction_results apply_extraction create_transaction add_key_dates_batch apply_checklist create_reminder get_intake_status render_email_template send_email_to_agent send_client_update confirm_email_send search_contacts create_contact add_contact_to_transaction create_deal_calendar_event send_key_date_invites preview_playbook apply_playbook get_portal_link"
-  docjacket-scopes: "actions"
-  docjacket-version: "1.3.0"
 ---
+
+<!--
+docjacket-title: Intake a contract PDF and build a complete transaction in one conversation
+docjacket-tools: list_documents extract_existing_document create_upload_link get_upload_link_status list_new_deal_intake request_upload_url kick_off_extraction upload_document_for_extraction get_extraction_results apply_extraction create_transaction add_key_dates_batch apply_checklist create_reminder get_intake_status render_email_template send_email_to_agent send_client_update confirm_email_send search_contacts create_contact add_contact_to_transaction create_deal_calendar_event send_key_date_invites preview_playbook apply_playbook get_portal_link
+docjacket-scopes: actions
+docjacket-version: 1.3.1
+-->
 
 # Contract Intake
 
@@ -79,16 +76,15 @@ When the TC says "extract the contract I uploaded last night" or "process the fi
 
 **Path C — Not in DocJacket yet: email it.** Ask the user to email or forward the PDF, from their own email address, to their new-deal address: `get_organization_summary` → `intake_addresses.new_deal.address`. Email from anyone else waits in the Review Queue. Then poll `list_new_deal_intake` to see what became of it. No bytes pass through chat, and it needs no paid plan or code execution.
 
-**Path D — Attached to chat, code sandbox that can reach `uploadHost`.** TC drops a PDF directly in chat that isn't in DocJacket yet. Two-step presigned upload: bytes go from the LLM's sandbox to blob storage via curl, never touching chat tokens.
+**Path D — Attached to chat, code sandbox that can reach `uploadHost`.** TC drops a PDF directly in chat that isn't in DocJacket yet. Two-step presigned upload: bytes go from the LLM's sandbox straight to the presigned URL, never touching chat tokens. Prefer Path B (the upload link) whenever it works; it needs no sandbox.
 
 ```
 2a. request_upload_url({ filename: "contract.pdf" })
     → { uploadId, uploadUrl, method: "PUT", headers, expiresAt }
 
-2b. (In the code-execution sandbox:)
-    bash> curl -X PUT -T /mnt/user-data/uploads/contract.pdf \
-            -H "Content-Type: application/pdf" \
-            "<uploadUrl>"
+2b. In the code-execution sandbox, send the PDF's bytes to uploadUrl as an HTTP PUT with exactly
+    the method and headers request_upload_url returned (Content-Type: application/pdf). Send
+    them nowhere else, and add no other headers.
 
 2c. kick_off_extraction({ uploadId, filename, state?, side?, documentTypeHint? })
     → { extractionJobId, status: "queued", estimatedSecondsToComplete, cacheHit }

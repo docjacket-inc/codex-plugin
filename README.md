@@ -5,7 +5,7 @@
 # DocJacket — Transaction Coordination plugin for Codex
 
 [![Plugin](https://img.shields.io/badge/Codex-plugin-purple)]()
-[![Version](https://img.shields.io/badge/version-0.9.0-green)]()
+[![Version](https://img.shields.io/badge/version-0.9.1-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
 Connect DocJacket transactions, tasks, deadlines, contacts, and document checklists to OpenAI Codex. Triage your pipeline, draft and send follow-up emails from your connected Gmail, classify inbound attachments against the right deal — all from inside Codex.
@@ -26,7 +26,7 @@ Selected highlights — for the **live and complete** list with per-tool gotchas
 
 **Diagnostics + introspection**: `mcp_health_check`, `mcp_catalog`, `get_procedure` (the step-by-step procedures behind the skills).
 
-**Reads**: `search_transactions`, `get_transaction`, `get_key_dates`, `get_open_tasks`, `get_contacts`, `get_upcoming_key_dates`, `list_open_contingencies`, **`get_next_required_actions`** (bundled-judgment flagship), `find_transaction_by_property`, `get_missing_documents`, `list_active_transactions`, `search_contacts`, `get_contact`, `list_email_templates`, `get_email_template`.
+**Reads**: `search_transactions`, `get_transaction`, `get_key_dates`, `get_open_tasks`, `get_contacts`, `get_upcoming_key_dates`, `list_open_contingencies`, **`get_next_required_actions`** (bundled-judgment flagship), `find_transaction_by_property`, `get_missing_documents`, `list_active_transactions`, `search_contacts` (also one contact in full by `contactId`), `list_email_templates`, `get_email_template`.
 
 **Emails** (previewed; sent only after your yes with `confirm_email_send`, or held for a team member's approval): `send_client_update`, `send_agent_followup`, `send_document_request`, `send_email_to_agent`, `render_email_template`.
 
@@ -99,6 +99,8 @@ See [`CONNECTORS.md`](CONNECTORS.md) — Gmail / Calendar / Drive / Slack compos
 This plugin does NOT provide legal advice. See [`DISCLAIMER.md`](DISCLAIMER.md) for the full scope and limitations.
 
 ## Version
+
+`0.9.1` (2026-11-15) — Skill frontmatter is plain `key: value` lines (skill metadata moves to a comment under the frontmatter), shared with the Claude plugin's directory-policy release. `dj-cli` no longer shows a download-and-run install command, and `contract-intake` describes the sandbox upload without a shell upload command and points to the upload link first. Skills follow the current tool names: `get_open_tasks` (with its `summary` counts) instead of `get_checklist_status`, and `search_contacts` with `contactId` instead of `get_contact`.
 
 `0.9.0` (2026-11-15) — Catches up with the current DocJacket MCP server: four new skills (`deal-updates`, `playbook-builder`, `workspace-setup`, `compliance-filing`) cover changing live deals, building Playbooks, organization setup and compliance filing; `contract-intake` adds the upload-link path (`create_upload_link`); skills use the current tool names (`review_deal_health`, `prepare_compliance_handoff`, `get_transaction_context`); stale "no upload tool" and connector text fixed.
 

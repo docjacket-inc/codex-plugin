@@ -1,21 +1,15 @@
 ---
 name: execution-workflow
-description: >-
-  Composes work in chat and carries it out in DocJacket. Emails are previewed to the user and sent
-  only after an explicit yes via confirm_email_send (or wait in the DocJacket review queue for a
-  team member); internal changes (tasks, key dates, reminders, contacts, Playbooks) run on call.
-  Reports a status such as awaiting_confirmation, parked_for_review, queued, created or updated,
-  plus a one-line summary of what was done or what is waiting; an email is never reported as on
-  its way unless confirm_email_send returned status queued. Use when the TC asks to send an email,
-  create or change tasks, update key dates, set reminders, add or update contacts, send calendar
-  invites, or apply a Playbook.
+description: Composes work in chat and carries it out in DocJacket. Emails are previewed to the user and sent only after an explicit yes via confirm_email_send (or wait in the DocJacket review queue for a team member); internal changes (tasks, key dates, reminders, contacts, Playbooks) run on call. Reports a status such as awaiting_confirmation, parked_for_review, queued, created or updated, plus a one-line summary of what was done or what is waiting; an email is never reported as on its way unless confirm_email_send returned status queued. Use when the TC asks to send an email, create or change tasks, update key dates, set reminders, add or update contacts, send calendar invites, or apply a Playbook.
 license: MIT
-metadata:
-  docjacket-title: "Send emails, create tasks, and update key dates in DocJacket"
-  docjacket-tools: "send_client_update send_document_request send_agent_followup send_email_to_agent confirm_email_send create_tasks complete_task update_task reschedule_task reassign_task delete_tasks update_key_date add_key_dates_batch create_reminder update_reminder cancel_reminder get_reminders save_status_summary search_contacts create_contact update_contact add_contact_to_transaction create_deal_calendar_event send_key_date_invites cancel_key_date_invites list_playbooks get_playbook preview_playbook apply_playbook undo_playbook start_playbook_draft list_playbook_drafts commit_playbook_draft undo_playbook_setup"
-  docjacket-scopes: "draft"
-  docjacket-version: "1.2.0"
 ---
+
+<!--
+docjacket-title: Send emails, create tasks, and update key dates in DocJacket
+docjacket-tools: send_client_update send_document_request send_agent_followup send_email_to_agent confirm_email_send create_tasks complete_task update_task reschedule_task reassign_task delete_tasks update_key_date add_key_dates_batch create_reminder update_reminder cancel_reminder get_reminders save_status_summary search_contacts create_contact update_contact add_contact_to_transaction create_deal_calendar_event send_key_date_invites cancel_key_date_invites list_playbooks get_playbook preview_playbook apply_playbook undo_playbook start_playbook_draft list_playbook_drafts commit_playbook_draft undo_playbook_setup
+docjacket-scopes: draft
+docjacket-version: 1.2.0
+-->
 
 # Execution workflow
 
@@ -147,7 +141,7 @@ Send a request id on every write. Over MCP set the header `X-DocJacket-Client-Re
 
 Get every id from a lookup read; never guess or invent one, and never reuse an id from an earlier conversation without re-reading.
 
-- taskId: `get_open_tasks` (use `search` for words in the title; `scope: "org"` to search beyond one deal) or `get_checklist_status`.
+- taskId: `get_open_tasks` (use `search` for words in the title; `scope: "org"` to search beyond one deal).
 - contactId: `search_contacts`, `get_contacts`, `find_contact_by_email`.
 - keyDateId: `get_key_dates`.
 - reminderId: `get_reminders` (states: `sent`, `awaiting_review`, `cancelled`, `held`, `scheduled`). `update_reminder` and `cancel_reminder` only work on reminders that have not gone out yet (`REMINDER_SENT` otherwise).

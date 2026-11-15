@@ -1,17 +1,15 @@
 ---
 name: daily-triage
-description: >-
-  Finds every DocJacket transaction that needs attention today and surfaces the next action per
-  deal, as a bulleted list grouped by the urgency buckets the tool returns, most urgent first. Use
-  when the TC asks what needs attention today, for a morning briefing, or for a triage of their
-  active deals.
+description: Finds every DocJacket transaction that needs attention today and surfaces the next action per deal, as a bulleted list grouped by the urgency buckets the tool returns, most urgent first. Use when the TC asks what needs attention today, for a morning briefing, or for a triage of their active deals.
 license: MIT
-metadata:
-  docjacket-title: "Daily Triage"
-  docjacket-tools: "get_next_required_actions"
-  docjacket-scopes: "read"
-  docjacket-version: "0.2.0"
 ---
+
+<!--
+docjacket-title: Daily Triage
+docjacket-tools: get_next_required_actions
+docjacket-scopes: read
+docjacket-version: 0.2.1
+-->
 
 # Daily Triage
 
@@ -65,6 +63,8 @@ Render the `rationale` string verbatim — it's already phrased for human readin
 If `summary.totalCount === 0`, render: `✅ All clear — no items need attention right now.`
 
 For each non-empty bucket, the section header should include the count from `summary` (e.g. `🔥 Overdue (3)`).
+
+The `summary` counts cover every qualifying item, not only the rows in `actions`. When `summary.truncated` is true, say the list shows the first `summary.returned` of `summary.totalCount` items (and "at least" when `summary.countsAreLowerBound` is true).
 
 ## Anti-patterns (do not do)
 

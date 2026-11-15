@@ -1,18 +1,15 @@
 ---
 name: email-triage
-description: >-
-  Cross-references the TC's Gmail or Outlook inbox against active DocJacket deals, groups matched
-  email by transaction, and surfaces what needs the TC's attention as a per-transaction briefing
-  of matched email, attachments and deadline proximity, with explicit asks for the TC's decisions.
-  Use when the TC asks to triage their inbox, match emails to deals, or find which deal an email
-  belongs to.
+description: Cross-references the TC's Gmail or Outlook inbox against active DocJacket deals, groups matched email by transaction, and surfaces what needs the TC's attention as a per-transaction briefing of matched email, attachments and deadline proximity, with explicit asks for the TC's decisions. Use when the TC asks to triage their inbox, match emails to deals, or find which deal an email belongs to.
 license: MIT
-metadata:
-  docjacket-title: "Match Gmail / Outlook emails to DocJacket transactions and identify required actions"
-  docjacket-tools: "list_active_transactions find_contact_by_email search_transactions classify_document get_missing_documents get_checklist_status get_upcoming_key_dates"
-  docjacket-scopes: "read"
-  docjacket-version: "1.0.0"
 ---
+
+<!--
+docjacket-title: Match Gmail / Outlook emails to DocJacket transactions and identify required actions
+docjacket-tools: list_active_transactions find_contact_by_email search_transactions classify_document get_missing_documents get_open_tasks get_upcoming_key_dates
+docjacket-scopes: read
+docjacket-version: 1.0.0
+-->
 
 # Email-to-Transaction Triage
 

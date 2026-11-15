@@ -1,18 +1,15 @@
 ---
 name: document-filing
-description: >-
-  Helps the TC identify what each attachment is and which DocJacket transaction it belongs to.
-  DocJacket's classifier suggests a document type; the TC decides where it is filed. Produces a
-  "[filename] looks like [type] for [transaction]" prompt that notes when it fills a gap on the
-  missing-documents list, with an optional follow-up task so the document gets uploaded. Use when
-  the TC has attachments or documents to identify, classify or file to a deal.
+description: Helps the TC identify what each attachment is and which DocJacket transaction it belongs to. DocJacket's classifier suggests a document type; the TC decides where it is filed. Produces a "[filename] looks like [type] for [transaction]" prompt that notes when it fills a gap on the missing-documents list, with an optional follow-up task so the document gets uploaded. Use when the TC has attachments or documents to identify, classify or file to a deal.
 license: MIT
-metadata:
-  docjacket-title: "Classify documents and propose filing them to the right transaction"
-  docjacket-tools: "classify_document get_missing_documents search_transactions find_contact_by_email create_tasks"
-  docjacket-scopes: "read"
-  docjacket-version: "1.0.0"
 ---
+
+<!--
+docjacket-title: Classify documents and propose filing them to the right transaction
+docjacket-tools: classify_document get_missing_documents search_transactions find_contact_by_email create_tasks
+docjacket-scopes: read
+docjacket-version: 1.0.0
+-->
 
 # Document Filing
 
