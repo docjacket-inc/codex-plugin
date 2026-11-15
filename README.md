@@ -38,7 +38,7 @@ Selected highlights — for the **live and complete** list with per-tool gotchas
 
 **Playbooks**: `start_playbook_draft`, `get_draft`, `add_tasks`, `copy_tasks`, `validate_draft`, `commit_playbook_draft` and the other draft tools.
 
-**Workspace setup**: `get_setup_status`, `set_agent_defaults`, `change_org_setting`, `save_email_template`, `install_template_pack`, `create_form_template`, `get_plan`, `get_checkout_link`.
+**Workspace setup**: `get_setup_status`, `set_agent_defaults`, `change_org_setting`, `save_email_template`, `install_template_pack`, `create_form_template`, `get_plan`.
 
 **Compliance**: `get_compliance_system`, `prepare_compliance_handoff`, `review_signatures`, `get_signature_review`, `send_compliance_documents`.
 
