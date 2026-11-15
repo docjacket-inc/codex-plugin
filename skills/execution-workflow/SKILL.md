@@ -70,7 +70,7 @@ Show the `summary` to the user. For an email, the action is not done until `conf
 | "Add a task to follow up on X" or "remind me to Y by Z" | `create_tasks` |
 | "Set a reminder for [X days] before [deadline]" or "nudge the agent before EMD" | `create_reminder` |
 | "Summarize this transaction for me" or "save a status recap on the deal" | `save_status_summary` |
-| "Mark that task done" | `complete_task` (taskId from `get_open_tasks`). If its result has `completionEmailsHeld: true`, the emails the task triggers are held, NOT sent (listed in `heldEmails`, or by `list_held_emails` when that is empty): never send them yourself, and do not render or send `triggeredEmailTemplates`; release each like a held email (below) or discard it |
+| "Mark that task done" | `complete_task` (taskId from `get_open_tasks`). If its result has `completionEmailsHeld: true`, the emails the task triggers are held, NOT sent (listed in `heldEmails`, or by `list_held_emails` when that is empty): never send them yourself, and do not render or send `triggeredEmailTemplates`; when `heldFor` is `"assistant"`, release each like a held email (below) or discard it; when it is `"person"`, tell the user they are waiting for their approval in DocJacket, because no assistant can release them |
 | "Change that task's title or notes" | `update_task` |
 | "Push that task to Friday" | `reschedule_task` |
 | "Give that task to Dana" | `reassign_task` |
@@ -103,7 +103,7 @@ Compose the email, then call the `send_*` tool. It sends nothing. The recipient 
 2. **`status: "parked_for_review"`.** The email has NOT been sent. It is waiting in the DocJacket review queue for a team member. Tell the user in plain words: "It is waiting for approval in DocJacket, not sent yet", and give `reviewReason` (or `heldBecause`) if present. Never say sent, delivered or done. There is no code to confirm and nothing more for you to call; do not call the send tool again to push it through. The organization's setting (`review_auto_emails_before_send`) decides between this path and the preview, and you cannot override it.
 3. **`confirm_email_send` returns `status: "queued"`** (approved and queued to send; `get_held_email` shows `sent` or `failed` once it is done) or `"discarded"`, or `"already_approved"` if a reviewer got there first. Report exactly that.
 
-**Releasing a held email.** Only some organizations let you release an email DocJacket is holding (`list_held_emails`). There, `prepare_held_email_approval` with its `actionId` prepares the release and sends nothing: `status: "awaiting_confirmation"` works exactly like step 1 (show the COMPLETE preview, confirm only on an explicit yes, `decision: "discard"` on a no). `status: "cannot_release"` means a blocking hold reason must be fixed first; tell the user what `holdReasons` says. `NOT_ENABLED` means the organization approves held emails in DocJacket; tell the user it is waiting there. A held email whose requested send time has passed (`requested_send_time_passed`, or `SEND_TIME_PASSED` from confirm) can only be rescheduled or sent now in DocJacket's web app: tell the user, and do not prepare it again.
+**Releasing a held email.** Only some organizations let you release an email DocJacket is holding (`list_held_emails`). There, `prepare_held_email_approval` with its `actionId` prepares the release and sends nothing: `status: "awaiting_confirmation"` works exactly like step 1 (show the COMPLETE preview, confirm only on an explicit yes, `decision: "discard"` on a no). `status: "cannot_release"` means a blocking hold reason must be fixed first; tell the user what `holdReasons` says. `person_must_approve` cannot be fixed from here: a team member approves that email in DocJacket. `NOT_ENABLED` means the organization approves held emails in DocJacket; tell the user it is waiting there. A held email whose requested send time has passed (`requested_send_time_passed`, or `SEND_TIME_PASSED` from confirm) can only be rescheduled or sent now in DocJacket's web app: tell the user, and do not prepare it again.
 
 If `confirm_email_send` returns an error, read the code:
 
@@ -150,7 +150,7 @@ Get every id from a lookup read; never guess or invent one, and never reuse an i
 - taskId: `get_open_tasks` (use `search` for words in the title; `scope: "org"` to search beyond one deal) or `get_checklist_status`.
 - contactId: `search_contacts`, `get_contacts`, `find_contact_by_email`.
 - keyDateId: `get_key_dates`.
-- reminderId: `get_reminders` (states: `sent`, `awaiting_review`, `held`, `scheduled`). `update_reminder` and `cancel_reminder` only work on reminders that have not gone out yet (`REMINDER_SENT` otherwise).
+- reminderId: `get_reminders` (states: `sent`, `awaiting_review`, `cancelled`, `held`, `scheduled`). `update_reminder` and `cancel_reminder` only work on reminders that have not gone out yet (`REMINDER_SENT` otherwise).
 - Playbook id: `list_playbooks`, then `get_playbook`.
 - transactionId: `search_transactions` or `find_transaction_by_property`.
 

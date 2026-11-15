@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "docjacket",
-  "version": "0.8.1",
-  "description": "Connect your DocJacket transactions, tasks, deadlines, contacts, and contingencies to Codex and ChatGPT. Ten skills cover contract intake, inbox triage, document filing, morning briefings, closing prep, follow-ups and contacts. Every email is shown to you in full and goes out only after you say yes (or after a team member approves it in DocJacket, if your organization reviews emails); tasks, dates and contacts update right away. Sign in to DocJacket over OAuth when you install; no token to paste. Call `mcp_catalog` after install for the live tool inventory.",
+  "version": "0.9.0",
+  "description": "Connect your DocJacket transactions, tasks, deadlines, contacts, and contingencies to Codex and ChatGPT. Fourteen skills cover contract intake, inbox triage, document filing, morning briefings, closing prep, follow-ups, contacts, deal updates, Playbook building, workspace setup and compliance filing. Every email is shown to you in full and goes out only after you say yes (or after a team member approves it in DocJacket, if your organization reviews emails); tasks, dates and contacts update right away. Sign in to DocJacket over OAuth when you install; no token to paste. Call `mcp_catalog` after install for the live tool inventory.",
   "author": {
     "name": "DocJacket Software Inc",
     "email": "support@docjacket.com",

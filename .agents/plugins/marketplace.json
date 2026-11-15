@@ -2,7 +2,7 @@
   "$schema": "https://schemas.openai.com/codex/plugin-marketplace.v1.json",
   "name": "docjacket",
   "displayName": "DocJacket",
-  "description": "Connect your DocJacket transactions, tasks, key dates, documents and contacts to Codex and ChatGPT. Ten skills; OAuth sign-in, no token to paste. Call mcp_catalog for the live tool list.",
+  "description": "Connect your DocJacket transactions, tasks, key dates, documents and contacts to Codex and ChatGPT. Fourteen skills; OAuth sign-in, no token to paste. Call mcp_catalog for the live tool list.",
   "publisher": "DocJacket Software Inc",
   "homepage": "https://www.docjacket.com/mcp",
   "documentation": "https://help.docjacket.com/docs/mcp/codex",
@@ -15,7 +15,7 @@
       },
       "interface": {
         "displayName": "DocJacket",
-        "description": "Ten workflow skills for DocJacket transactions: contract intake, inbox triage, document filing, morning briefings, closing prep, follow-ups, contacts and the dj CLI. Call mcp_catalog after install for the live tool inventory."
+        "description": "Fourteen workflow skills for DocJacket transactions: contract intake, inbox triage, document filing, morning briefings, closing prep, follow-ups, contacts, deal updates, Playbook building, workspace setup, compliance filing and the dj CLI. Call mcp_catalog after install for the live tool inventory."
       }
     }
   ]

@@ -5,7 +5,7 @@
 # DocJacket — Transaction Coordination plugin for Codex
 
 [![Plugin](https://img.shields.io/badge/Codex-plugin-purple)]()
-[![Version](https://img.shields.io/badge/version-0.8.1-green)]()
+[![Version](https://img.shields.io/badge/version-0.9.0-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
 Connect DocJacket transactions, tasks, deadlines, contacts, and document checklists to OpenAI Codex. Triage your pipeline, draft and send follow-up emails from your connected Gmail, classify inbound attachments against the right deal — all from inside Codex.
@@ -16,19 +16,31 @@ Connect DocJacket transactions, tasks, deadlines, contacts, and document checkli
 
 - **Full read + send tool suite** via the DocJacket MCP server at `https://mcp.docjacket.com/mcp`. Call `mcp_catalog` after install for the live inventory + per-tool gotchas and example calls.
 - **`mcp_health_check`** — first call when integrating; verifies auth, scopes, and DB reachability.
-- **10 skills**: `closing-prep`, `contact-management`, `contract-intake`, `daily-triage`, `dj-cli`, `document-filing`, `email-triage`, `execution-workflow`, `follow-up-drafting`, `tc-context`. Each ships as an Agent Skill under `skills/<name>/SKILL.md`.
+- **14 skills**: `closing-prep`, `compliance-filing`, `contact-management`, `contract-intake`, `daily-triage`, `deal-updates`, `dj-cli`, `document-filing`, `email-triage`, `execution-workflow`, `follow-up-drafting`, `playbook-builder`, `tc-context`, `workspace-setup`. Each ships as an Agent Skill under `skills/<name>/SKILL.md`.
 
-Three scope tiers — Read (search, summarize), Draft (compose without sending), Actions (send emails, create tasks, update dates). You authorize once at OAuth consent; the chat is the per-call approval gate.
+Three scope tiers — Read (search, summarize), Draft (compose without sending), Actions (send emails, create tasks, update dates). You authorize once at OAuth consent; the chat is the per-call approval gate. Two optional toolsets, **Disclosure packages** and **Offers**, are listed only when you tick them on the DocJacket consent screen; reconnect DocJacket to add one.
 
 ## Tool catalog
 
 Selected highlights — for the **live and complete** list with per-tool gotchas, pairing hints, and example calls, run `mcp_catalog` after install.
 
-**Diagnostics + introspection**: `mcp_health_check`, `mcp_catalog`.
+**Diagnostics + introspection**: `mcp_health_check`, `mcp_catalog`, `get_procedure` (the step-by-step procedures behind the skills).
 
 **Reads**: `search_transactions`, `get_transaction`, `get_key_dates`, `get_open_tasks`, `get_contacts`, `get_upcoming_key_dates`, `list_open_contingencies`, **`get_next_required_actions`** (bundled-judgment flagship), `find_transaction_by_property`, `get_missing_documents`, `list_active_transactions`, `search_contacts`, `get_contact`, `list_email_templates`, `get_email_template`.
 
-**Direct execution**: `send_client_update`, `send_agent_followup`, `send_document_request`, `send_email_to_agent`, `create_tasks`, `update_key_date`, `complete_task`, `save_status_summary`, `render_email_template`, `add_contact_to_transaction`, `create_contact`.
+**Emails** (previewed; sent only after your yes with `confirm_email_send`, or held for a team member's approval): `send_client_update`, `send_agent_followup`, `send_document_request`, `send_email_to_agent`, `render_email_template`.
+
+**Direct execution against DocJacket**: `create_tasks`, `update_key_date`, `complete_task`, `save_status_summary`, `add_contact_to_transaction`, `create_contact`.
+
+**Contract intake**: `create_upload_link` + `get_upload_link_status` (drop the PDF on a link, works in every client), `extract_existing_document`, `get_extraction_results`, `apply_extraction`.
+
+**Deal updates**: `review_deal_health`, `get_transaction_context`, `get_deal_section`, `update_deal`, `manage_key_date`, `set_key_date_outcome`, `set_task_outcome`, `manage_note`, `manage_deal_contact`, `restore_deal`.
+
+**Playbooks**: `start_playbook_draft`, `get_draft`, `add_tasks`, `copy_tasks`, `validate_draft`, `commit_playbook_draft` and the other draft tools.
+
+**Workspace setup**: `get_setup_status`, `set_agent_defaults`, `change_org_setting`, `save_email_template`, `install_template_pack`, `create_form_template`, `get_plan`, `get_checkout_link`.
+
+**Compliance**: `get_compliance_system`, `prepare_compliance_handoff`, `review_signatures`, `get_signature_review`, `send_compliance_documents`.
 
 ## Install
 
@@ -87,6 +99,8 @@ See [`CONNECTORS.md`](CONNECTORS.md) — Gmail / Calendar / Drive / Slack compos
 This plugin does NOT provide legal advice. See [`DISCLAIMER.md`](DISCLAIMER.md) for the full scope and limitations.
 
 ## Version
+
+`0.9.0` (2026-11-15) — Catches up with the current DocJacket MCP server: four new skills (`deal-updates`, `playbook-builder`, `workspace-setup`, `compliance-filing`) cover changing live deals, building Playbooks, organization setup and compliance filing; `contract-intake` adds the upload-link path (`create_upload_link`); skills use the current tool names (`review_deal_health`, `prepare_compliance_handoff`, `get_transaction_context`); stale "no upload tool" and connector text fixed.
 
 `0.8.1` (2026-11-14) — Listing fixes for the OpenAI directory: homepage and website link point at https://www.docjacket.com/mcp (the old docjacket.com/ai-access link was a 404); support, privacy and terms links added to the listing; `mcp.json` no longer sends custom headers (OpenAI public submission rejects them; OAuth sign-in is unchanged); MCP access is included with every DocJacket plan (Free: 100 MCP calls per month).
 

@@ -9,7 +9,7 @@ license: MIT
 metadata:
   docjacket-title: "Transaction Coordinator vocabulary and DocJacket data model"
   docjacket-scopes: "read"
-  docjacket-version: "1.0.0"
+  docjacket-version: "1.1.0"
 ---
 
 # Transaction Coordinator Context
@@ -41,6 +41,12 @@ You are assisting a **real estate transaction coordinator (TC)** — the operati
 - **Key Date** — a contractual deadline. Has a Type (`ClosingDate`, `InspectionDeadline`, etc.) + optional custom name.
 - **Task** — a checklist item. Has a status (`Pending` / `InProgress` / `Completed` / `Skipped`), optional due date, optional assignee.
 - **Portal Link** — a tokenized URL the TC shares with parties so they can view the deal timeline.
+
+## Finding the right tool and procedure
+
+- **`mcp_catalog`** lists every tool this connection can call, with gotchas, pairings and example calls. Use it when a job touches more than a couple of tools.
+- **`get_procedure`** returns DocJacket's step-by-step procedures (the same text as these skills) when a host did not load them: no name for the list, a name for one procedure.
+- Two optional toolsets, **Disclosure packages** and **Offers**, appear in the tool list only when the user ticked them on the DocJacket consent screen. To add one, the user reconnects DocJacket and ticks it.
 
 ## Matching emails to transactions — priority order
 

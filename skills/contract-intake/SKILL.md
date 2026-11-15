@@ -9,9 +9,9 @@ description: >-
 license: MIT
 metadata:
   docjacket-title: "Intake a contract PDF and build a complete transaction in one conversation"
-  docjacket-tools: "list_documents extract_existing_document request_upload_url kick_off_extraction upload_document_for_extraction get_extraction_results apply_extraction create_transaction add_key_dates_batch apply_checklist create_reminder get_intake_status render_email_template send_email_to_agent send_client_update confirm_email_send search_contacts create_contact add_contact_to_transaction create_deal_calendar_event send_key_date_invites preview_playbook apply_playbook get_portal_link"
+  docjacket-tools: "list_documents extract_existing_document create_upload_link get_upload_link_status list_new_deal_intake request_upload_url kick_off_extraction upload_document_for_extraction get_extraction_results apply_extraction create_transaction add_key_dates_batch apply_checklist create_reminder get_intake_status render_email_template send_email_to_agent send_client_update confirm_email_send search_contacts create_contact add_contact_to_transaction create_deal_calendar_event send_key_date_invites preview_playbook apply_playbook get_portal_link"
   docjacket-scopes: "actions"
-  docjacket-version: "1.1.0"
+  docjacket-version: "1.3.0"
 ---
 
 # Contract Intake
@@ -45,7 +45,7 @@ The flow has five phases. Each ends with the LLM confirming the result before th
 
 ### Phase 1 — Upload + extract
 
-There are three paths. Pick by where the PDF is and what the MCP client supports.
+There are five paths, in this order. Pick by where the PDF is and what the MCP client supports.
 
 **Path A — Already in DocJacket (canonical, try this first).** The TC uploaded the PDF earlier via DocDrop, email intake, the web wizard, or a prior chat call. No bytes move; DocJacket already has them. Works in every MCP client (Cowork, Codex, ChatGPT, Claude.ai free or paid, Gemini).
 
@@ -66,9 +66,20 @@ There are three paths. Pick by where the PDF is and what the MCP client supports
 
 When the TC says "extract the contract I uploaded last night" or "process the file from this morning," this is the path. Always call `list_documents` first to surface candidates rather than guessing.
 
-**Path B — Not in DocJacket yet: email it (default in every client).** Ask the user to email or forward the PDF, from their own email address, to their new-deal address: `get_organization_summary` → `intake_addresses.new_deal.address`. Email from anyone else waits in the Review Queue. Then poll `list_new_deal_intake` to see what became of it. No bytes pass through chat, and it needs no paid plan or code execution.
+**Path B — Not in DocJacket yet: an upload link (default in every client).** No code sandbox, no paid plan, and no bytes in chat.
 
-**Path C — Attached to chat, code sandbox that can reach `uploadHost`.** TC drops a PDF directly in chat that isn't in DocJacket yet. Two-step presigned upload: bytes go from the LLM's sandbox to blob storage via curl, never touching chat tokens.
+```
+2a. create_upload_link({ filename?, state?, side?, documentTypeHint?, transactionId? })
+    → { uploadLinkId, url }: tell the user to open the url in the browser where they use DocJacket and drop the PDF there
+2b. get_upload_link_status({ uploadLinkId })   // waits on the server up to waitSeconds (default 30, max 45)
+    → waiting | uploading → call again straight away
+    → submitted → { extractionJobId } → continue with Phase 2
+    → failed (relay errorCode) | expired (create a new link)
+```
+
+**Path C — Not in DocJacket yet: email it.** Ask the user to email or forward the PDF, from their own email address, to their new-deal address: `get_organization_summary` → `intake_addresses.new_deal.address`. Email from anyone else waits in the Review Queue. Then poll `list_new_deal_intake` to see what became of it. No bytes pass through chat, and it needs no paid plan or code execution.
+
+**Path D — Attached to chat, code sandbox that can reach `uploadHost`.** TC drops a PDF directly in chat that isn't in DocJacket yet. Two-step presigned upload: bytes go from the LLM's sandbox to blob storage via curl, never touching chat tokens.
 
 ```
 2a. request_upload_url({ filename: "contract.pdf" })
@@ -83,28 +94,27 @@ When the TC says "extract the contract I uploaded last night" or "process the fi
     → { extractionJobId, status: "queued", estimatedSecondsToComplete, cacheHit }
 ```
 
-Requires a code-execution sandbox whose network allowlist includes the host returned as `uploadHost` (an R2 storage host, not mcp.docjacket.com). If 2b fails with a 403 / network / DNS error, the sandbox cannot reach `uploadHost` — stop and use Path B (email) instead; do not retry.
+Requires a code-execution sandbox whose network allowlist includes the host returned as `uploadHost` (an R2 storage host, not mcp.docjacket.com). If 2b fails with a 403 / network / DNS error, the sandbox cannot reach `uploadHost` — stop and use Path B (upload link) or Path C (email) instead; do not retry.
 
-**Path D — Attached to chat, anywhere else (last resort).** Tiny PDFs (~under 1 MB) attached to chat with no other option. Bytes ride in chat context for the rest of the conversation; compounds with later turns, so only use when paths A, B and C don't apply.
+**Path E — Attached to chat, anywhere else (last resort).** Tiny PDFs (~under 1 MB) attached to chat with no other option. Bytes ride in chat context for the rest of the conversation; compounds with later turns, so only use when paths A to D don't apply.
 
 ```
 3. upload_document_for_extraction({ fileBase64, filename, state?, side?, documentTypeHint? })
    → { extractionJobId, status: "queued", estimatedSecondsToComplete, cacheHit }
 ```
 
-If `cacheHit` comes back true (any path), the same PDF was extracted before — the response includes the prior job's complete results immediately. Skip Phase 2's polling loop.
+If `cacheHit` comes back true (any path), the same PDF was extracted before — the response includes the prior job's complete results immediately. Skip Phase 2's wait.
 
-### Phase 2 — Poll until extraction completes
+### Phase 2 — Wait until extraction completes
 
 ```
 2. get_extraction_results({ extractionJobId })
-   → { status: "processing", progressPercent: 35, ... }
-3. (wait 2-3 seconds)
-4. get_extraction_results({ extractionJobId })
+   → (the server waits up to 30 seconds) { status: "processing", progressPercent: 35, ... }
+3. get_extraction_results({ extractionJobId })   ← straight away, no pause
    → { status: "complete", fullResult: { parties, dates, financials, ... } }
 ```
 
-**Polling cadence: every 2-3 seconds. Max wait: 10 minutes** (typical job is 50-350s; the max-wait is for hung-job safety). While polling, update the user with a one-line "still working…" if more than ~15 seconds pass — don't go silent.
+**The call waits on the server** (`waitSeconds`, default 30, max 45) and answers as soon as the job finishes. While the status is still pending or processing, call it again straight away; don't sleep between calls. **Stop after 10 minutes in total** (typical job is 50-350s; the cap is for hung-job safety). Between calls, update the user with a one-line "still working…" — don't go silent.
 
 If `status: "failed"`, surface the `errorMessage` and ask whether to retry the upload (Phase 1 again, same file) or escalate.
 
@@ -277,7 +287,7 @@ If you suspect a partial-failure state, call `get_intake_status` first and only 
 - **Don't pre-populate `overrides` with every field** "just to be safe." Only include keys the user actually edited. Per-field merge means absent keys flow through unchanged — extra noise wastes tokens and slows the LLM's reasoning on the next round.
 - **Don't fabricate dates the contract doesn't state.** If the contract has no walkthrough date, leave it absent. The TC can add it later via `add_key_dates_batch` once they've negotiated it.
 - **Don't call `apply_extraction` more than once** for the same `extractionJobId` expecting a different result. It's idempotent — same job, same transaction. If the TC wants a NEW transaction from the same PDF, that's a workflow gap (escalate).
-- **Don't loop polling forever.** Cap at 10 minutes wall-clock. If extraction hasn't completed by then, something's wrong — surface the issue.
+- **Don't wait forever.** Cap at 10 minutes wall-clock. If extraction hasn't completed by then, something's wrong — surface the issue.
 - **Don't apply the checklist twice.** `apply_extraction` auto-applies the default state/type/side template. Calling `apply_checklist` again with the same template creates duplicates. Use `replaceExisting: true` if the TC explicitly wants to swap templates.
 
 ## Migration from the wizard
@@ -290,10 +300,13 @@ If a TC's prior workflow was the web app's upload wizard, this chat flow lands t
 |---|---|---|
 | `list_documents` | Read / `documents:read` | Phase 1a — Path A — find docs already in DocJacket |
 | `extract_existing_document` | Actions / `upload_document` | Phase 1c — Path A — canonical: extract a doc already in DocJacket |
-| `request_upload_url` | Actions / `upload_document` | Phase 2a — Path C — code sandbox that can reach uploadHost only |
-| `kick_off_extraction` | Actions / `upload_document` | Phase 2c — Path C — start pipeline after sandbox PUT |
-| `upload_document_for_extraction` | Actions / `upload_document` | Phase 3 — Path D — base64 last resort for tiny chat-attached PDFs |
-| `get_extraction_results` | Read / `documents:read` | Phase 2 — poll for completion |
+| `create_upload_link` | Actions / `upload_document` | Phase 1 — Path B — default for a PDF not in DocJacket: the user drops it on a link |
+| `get_upload_link_status` | Read / `documents:read` | Phase 1 — Path B — wait for the upload; returns `extractionJobId` |
+| `list_new_deal_intake` | Read / `transactions:read` | Phase 1 — Path C — what became of an emailed contract |
+| `request_upload_url` | Actions / `upload_document` | Phase 2a — Path D — code sandbox that can reach uploadHost only |
+| `kick_off_extraction` | Actions / `upload_document` | Phase 2c — Path D — start pipeline after sandbox PUT |
+| `upload_document_for_extraction` | Actions / `upload_document` | Phase 3 — Path E — base64 last resort for tiny chat-attached PDFs |
+| `get_extraction_results` | Read / `documents:read` | Phase 2 — wait for completion (the call waits on the server) |
 | `apply_extraction` | Actions / `transactions:create` | Phase 3 — confirm and create the transaction |
 | `create_transaction` | Actions / `transactions:create` | No-document path — blank deals from an address list (1-25) |
 | `add_key_dates_batch` | Draft / `key_dates:propose` | Phase 4 — batch-add timeline dates |
