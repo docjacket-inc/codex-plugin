@@ -1,19 +1,15 @@
 ---
 name: workspace-setup
-description: >-
-  Sets up and maintains a DocJacket organization from chat: the setup checklist, client agents
-  and their TC fees and coordinators, organization settings, contact roles, document categories,
-  custom fields, email templates and starter packs, online form templates, and the plan and
-  upgrade link. Every change is confirmed with the user first, and most can be undone for 7 days.
-  Use when the TC asks what to set up next, wants to set up their agents or fees, change a
-  setting, manage templates or forms, or asks about their plan, limits or upgrading.
+description: "Sets up and maintains a DocJacket organization from chat: the setup checklist, client agents and their TC fees and coordinators, organization settings, contact roles, document categories, custom fields, email templates and starter packs, online form templates, and the plan and upgrade link. Every change is confirmed with the user first, and most can be undone for 7 days. Use when the TC asks what to set up next, wants to set up their agents or fees, change a setting, manage templates or forms, or asks about their plan, limits or upgrading."
 license: MIT
-metadata:
-  docjacket-title: "Set up and maintain the organization: agents, settings, templates, forms and plan"
-  docjacket-tools: "get_setup_status propose_setup_from_evidence set_agent_defaults change_org_setting get_default_fees undo_setting_change get_contact_roles get_document_categories save_setup_item archive_setup_item get_custom_fields list_team_members list_email_templates get_email_template render_email_template get_merge_fields create_email_template save_email_template install_template_pack undo_template_change list_form_templates get_form_definition create_form_template clone_form_template add_form_template_fields get_plan get_checkout_link get_recent_support_history"
-  docjacket-scopes: "read actions"
-  docjacket-version: "1.0.0"
 ---
+
+<!--
+docjacket-title: Set up and maintain the organization: agents, settings, templates, forms and plan
+docjacket-tools: get_setup_status propose_setup_from_evidence set_agent_defaults change_org_setting get_default_fees undo_setting_change get_contact_roles get_document_categories save_setup_item archive_setup_item get_custom_fields list_team_members list_email_templates get_email_template render_email_template get_merge_fields create_email_template save_email_template install_template_pack undo_template_change list_form_templates get_form_definition create_form_template clone_form_template add_form_template_fields get_plan get_checkout_link get_recent_support_history
+docjacket-scopes: read actions
+docjacket-version: 1.0.0
+-->
 
 # Workspace Setup
 

@@ -1,20 +1,15 @@
 ---
 name: deal-updates
-description: >-
-  Keeps a live DocJacket deal accurate from chat: reads what is wrong with it, changes the deal
-  record (price, financing, side, type, address, numbers, custom fields), manages key dates and
-  their outcomes, records task outcomes with a 7-day undo, adds team notes and task or document
-  comments, changes who holds a seat on the deal, restores an archived deal, and approves or
-  rejects new deals waiting in the review queue. Use when the TC says something on a deal is
-  wrong or changed, a deadline was met or waived, tasks are done or not needed, wants a note
-  recorded, or asks what was said, sent or changed on a deal.
+description: "Keeps a live DocJacket deal accurate from chat: reads what is wrong with it, changes the deal record (price, financing, side, type, address, numbers, custom fields), manages key dates and their outcomes, records task outcomes with a 7-day undo, adds team notes and task or document comments, changes who holds a seat on the deal, restores an archived deal, and approves or rejects new deals waiting in the review queue. Use when the TC says something on a deal is wrong or changed, a deadline was met or waived, tasks are done or not needed, wants a note recorded, or asks what was said, sent or changed on a deal."
 license: MIT
-metadata:
-  docjacket-title: "Change and repair a live deal, with confirmation and undo"
-  docjacket-tools: "find_transaction_by_property review_deal_health get_transaction_context search_transaction_context get_transaction_knowledge get_deal_section get_custom_fields update_deal get_key_dates update_key_date manage_key_date set_key_date_outcome get_open_tasks set_task_outcome undo_task_outcome manage_note manage_deal_contact add_contact_to_transaction restore_deal list_new_deal_intake approve_new_deal_proposal reject_new_deal_proposal list_held_emails get_held_email discard_held_email list_team_members"
-  docjacket-scopes: "read draft actions"
-  docjacket-version: "1.0.0"
 ---
+
+<!--
+docjacket-title: Change and repair a live deal, with confirmation and undo
+docjacket-tools: find_transaction_by_property review_deal_health get_transaction_context search_transaction_context get_transaction_knowledge get_deal_section get_custom_fields update_deal get_key_dates update_key_date manage_key_date set_key_date_outcome get_open_tasks set_task_outcome undo_task_outcome manage_note manage_deal_contact add_contact_to_transaction restore_deal list_new_deal_intake approve_new_deal_proposal reject_new_deal_proposal list_held_emails get_held_email discard_held_email list_team_members
+docjacket-scopes: read draft actions
+docjacket-version: 1.0.0
+-->
 
 # Deal Updates
 

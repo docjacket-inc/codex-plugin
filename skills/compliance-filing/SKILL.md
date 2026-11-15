@@ -1,19 +1,15 @@
 ---
 name: compliance-filing
-description: >-
-  Gets a DocJacket deal into the brokerage's compliance system (such as Dotloop, SkySlope or KW
-  Command): finds which system the deal files in, prepares the deal's fields, parties and
-  document names for that system, checks signed PDFs for blank signature, initials and date
-  lines, and emails chosen documents to a Dotloop or SkySlope email-in address after the user
-  approves a preview. Use when the TC asks to file, submit or set up a deal in Dotloop, SkySlope
-  or another compliance system, or to check a document for missing signatures.
+description: "Gets a DocJacket deal into the brokerage's compliance system (such as Dotloop, SkySlope or KW Command): finds which system the deal files in, prepares the deal's fields, parties and document names for that system, checks signed PDFs for blank signature, initials and date lines, and emails chosen documents to a Dotloop or SkySlope email-in address after the user approves a preview. Use when the TC asks to file, submit or set up a deal in Dotloop, SkySlope or another compliance system, or to check a document for missing signatures."
 license: MIT
-metadata:
-  docjacket-title: "File a deal in the brokerage's compliance system and check signatures"
-  docjacket-tools: "find_transaction_by_property get_compliance_system set_compliance_system prepare_compliance_handoff list_documents review_signatures get_signature_review send_compliance_documents confirm_email_send undo_setting_change"
-  docjacket-scopes: "read actions"
-  docjacket-version: "1.0.0"
 ---
+
+<!--
+docjacket-title: File a deal in the brokerage's compliance system and check signatures
+docjacket-tools: find_transaction_by_property get_compliance_system set_compliance_system prepare_compliance_handoff list_documents review_signatures get_signature_review send_compliance_documents confirm_email_send undo_setting_change
+docjacket-scopes: read actions
+docjacket-version: 1.0.0
+-->
 
 # Compliance Filing
 

@@ -1,19 +1,15 @@
 ---
 name: playbook-builder
-description: >-
-  Builds a new DocJacket Playbook (a deal checklist of key dates, tasks, task emails and document
-  lists) or changes one of the organization's own Playbooks, through the Playbook builder's draft
-  tools. Everything is drafted first and saved only when the user approves the finished draft.
-  Also explains why a Playbook task is or isn't on a deal. Use when the TC wants to set up their
-  process, build or edit a checklist or Playbook, copy tasks between Playbooks, or asks why a task
-  showed up on a deal.
+description: Builds a new DocJacket Playbook (a deal checklist of key dates, tasks, task emails and document lists) or changes one of the organization's own Playbooks, through the Playbook builder's draft tools. Everything is drafted first and saved only when the user approves the finished draft. Also explains why a Playbook task is or isn't on a deal. Use when the TC wants to set up their process, build or edit a checklist or Playbook, copy tasks between Playbooks, or asks why a task showed up on a deal.
 license: MIT
-metadata:
-  docjacket-title: "Build or change a Playbook through a reviewed draft"
-  docjacket-tools: "get_customer_process list_checklist_templates start_playbook_draft list_playbook_drafts get_draft list_vocabulary read_playbook draft_playbook propose_key_dates draft_key_date propose_tasks add_tasks draft_task edit_tasks copy_tasks propose_task_emails draft_task_email draft_email_template propose_document_list draft_document_list copy_documents draft_finish preview_dates validate_draft commit_playbook_draft undo_playbook_setup explain_task"
-  docjacket-scopes: "read draft actions"
-  docjacket-version: "1.0.0"
 ---
+
+<!--
+docjacket-title: Build or change a Playbook through a reviewed draft
+docjacket-tools: get_customer_process list_checklist_templates start_playbook_draft list_playbook_drafts get_draft list_vocabulary read_playbook draft_playbook propose_key_dates draft_key_date propose_tasks add_tasks draft_task edit_tasks copy_tasks propose_task_emails draft_task_email draft_email_template propose_document_list draft_document_list copy_documents draft_finish preview_dates validate_draft commit_playbook_draft undo_playbook_setup explain_task
+docjacket-scopes: read draft actions
+docjacket-version: 1.0.0
+-->
 
 # Playbook Builder
 

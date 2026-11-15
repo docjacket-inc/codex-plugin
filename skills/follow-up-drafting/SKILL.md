@@ -1,19 +1,15 @@
 ---
 name: follow-up-drafting
-description: >-
-  Composes chase emails for missing documents, approaching deadlines and unanswered
-  communications, with tone calibrated to urgency and recipient. Shows the draft inline, asks for
-  confirmation, calls the matching send_* tool for a preview, then calls confirm_email_send on the
-  user's explicit yes; if the email was parked for review it reports that it is waiting for
-  approval, not sent. Use when the TC asks to follow up, chase a document, nudge an agent or
-  lender, or remind a party about a deadline.
+description: Composes chase emails for missing documents, approaching deadlines and unanswered communications, with tone calibrated to urgency and recipient. Shows the draft inline, asks for confirmation, calls the matching send_* tool for a preview, then calls confirm_email_send on the user's explicit yes; if the email was parked for review it reports that it is waiting for approval, not sent. Use when the TC asks to follow up, chase a document, nudge an agent or lender, or remind a party about a deadline.
 license: MIT
-metadata:
-  docjacket-title: "Draft and send follow-up emails for missing documents, approaching deadlines, and unanswered communications"
-  docjacket-tools: "get_transaction get_key_dates get_upcoming_key_dates get_missing_documents get_open_tasks get_contacts find_contact_by_email send_client_update send_document_request send_agent_followup send_email_to_agent confirm_email_send"
-  docjacket-scopes: "draft"
-  docjacket-version: "1.1.0"
 ---
+
+<!--
+docjacket-title: Draft and send follow-up emails for missing documents, approaching deadlines, and unanswered communications
+docjacket-tools: get_transaction get_key_dates get_upcoming_key_dates get_missing_documents get_open_tasks get_contacts find_contact_by_email send_client_update send_document_request send_agent_followup send_email_to_agent confirm_email_send
+docjacket-scopes: draft
+docjacket-version: 1.1.0
+-->
 
 # Follow-Up Drafting
 

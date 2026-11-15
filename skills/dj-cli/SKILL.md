@@ -1,21 +1,19 @@
 ---
 name: dj-cli
-description: >-
-  Reads DocJacket transactions, deadlines, tasks, documents and contacts through the `dj`
-  command-line tool when the agent has a shell, answering from dj's JSON output and carrying
-  transaction ids between commands. Use when the agent can run shell commands and the user asks
-  about their DocJacket data. Chat clients without a shell use the DocJacket MCP tools instead.
+description: Reads DocJacket transactions, deadlines, tasks, documents and contacts through the `dj` command-line tool when the agent has a shell, answering from dj's JSON output and carrying transaction ids between commands. Use when the agent can run shell commands and the user asks about their DocJacket data. Chat clients without a shell use the DocJacket MCP tools instead.
 license: MIT
-metadata:
-  docjacket-title: "Use DocJacket from a shell with the dj CLI"
-  docjacket-tools: "dj"
-  docjacket-scopes: "read"
-  docjacket-version: "0.1.1"
 ---
+
+<!--
+docjacket-title: Use DocJacket from a shell with the dj CLI
+docjacket-tools: dj
+docjacket-scopes: read
+docjacket-version: 0.1.2
+-->
 
 # DocJacket via the `dj` CLI
 
-`dj` reads DocJacket through its public API. It is **read-only**: it cannot send, change, or delete anything. **Use it only when you can run shell commands and `dj --version` works; otherwise use the DocJacket MCP tools** (for example `find_transaction_by_property`, `get_next_required_actions`). Setup: `curl -fsSL https://cdn.docjacket.com/dj/install.sh | sh`, then `export DJ_API_KEY=<key from Settings › API & AI Access>`. Check with `dj auth status`.
+`dj` reads DocJacket through its public API. It is **read-only**: it cannot send, change, or delete anything. **Use it only when you can run shell commands and `dj --version` works; otherwise use the DocJacket MCP tools** (for example `find_transaction_by_property`, `get_next_required_actions`). Never install `dj` yourself. Installing it is the user's choice: the installer script is published at `https://cdn.docjacket.com/dj/install.sh` for them to review and run, and the API key comes from Settings › API & AI Access (set as `DJ_API_KEY`). Once it is set up, `dj auth status` confirms the key works.
 
 ## The core loop
 

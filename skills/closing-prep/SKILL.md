@@ -1,18 +1,15 @@
 ---
 name: closing-prep
-description: >-
-  Walks the standard pre-closing checks against a DocJacket transaction and reports what is done,
-  what needs attention and what is missing, so the TC arrives at closing day with no surprises.
-  Produces a pre-closing report grouped by status (complete / needs attention / overdue) and
-  offers to send follow-ups or create tasks for any gaps. Use when the TC asks for a closing-prep
-  check, a pre-closing review, or what is still open before a deal closes.
+description: Walks the standard pre-closing checks against a DocJacket transaction and reports what is done, what needs attention and what is missing, so the TC arrives at closing day with no surprises. Produces a pre-closing report grouped by status (complete / needs attention / overdue) and offers to send follow-ups or create tasks for any gaps. Use when the TC asks for a closing-prep check, a pre-closing review, or what is still open before a deal closes.
 license: MIT
-metadata:
-  docjacket-title: "Run a pre-closing checklist for a transaction and surface what's missing or at risk"
-  docjacket-tools: "get_transaction get_key_dates get_missing_documents get_checklist_status list_open_contingencies get_open_tasks find_contact_by_email send_document_request send_agent_followup create_tasks"
-  docjacket-scopes: "read draft"
-  docjacket-version: "1.1.0"
 ---
+
+<!--
+docjacket-title: Run a pre-closing checklist for a transaction and surface what's missing or at risk
+docjacket-tools: get_transaction get_key_dates get_missing_documents get_open_tasks list_open_contingencies find_contact_by_email send_document_request send_agent_followup create_tasks
+docjacket-scopes: read draft
+docjacket-version: 1.1.0
+-->
 
 # Closing Preparation
 
@@ -29,9 +26,8 @@ metadata:
 1. **`get_transaction`** — full record (address, parties, side, price, status)
 2. **`get_key_dates`** — verify closing date and any pre-closing dates (final walkthrough, CD delivery)
 3. **`get_missing_documents`** — what documents are still expected
-4. **`get_checklist_status`** — task counts + overdue list
+4. **`get_open_tasks`** with `transactionId` — `summary` has the task counts (total / complete / pending / overdue); the list has each open task with its due date, overdue flag and assignee
 5. **`list_open_contingencies`** — inspection / appraisal / financing release status
-6. **`get_open_tasks`** — anything specific assigned
 
 ### Step 2 — Apply the pre-closing checklist
 
