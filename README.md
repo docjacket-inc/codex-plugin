@@ -48,7 +48,7 @@ Selected highlights — for the **live and complete** list with per-tool gotchas
 
 ### Prerequisites
 
-A DocJacket account on any plan. MCP access (AI Access) is included with every DocJacket plan. On Free it is limited to 100 MCP calls per month, with limited data extractions.
+A DocJacket account on any plan. MCP access (AI Access) is included with every DocJacket plan. On Free it is limited to 50 MCP calls per month, with limited data extractions.
 
 ### Codex CLI / Codex for Work
 
