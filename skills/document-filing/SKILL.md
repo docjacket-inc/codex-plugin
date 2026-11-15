@@ -63,7 +63,7 @@ The filename / content is ambiguous — could be Title Commitment or Title Insur
 
 ### Step 5 — Filing path (today)
 
-**There is no `upload_document` MCP tool yet.** Filing requires the TC to upload the file in the DocJacket UI. Tell them:
+**No MCP tool files a document onto a deal.** `create_upload_link` and the other upload tools are only for a contract going through extraction (see `contract-intake`). Filing requires the TC to upload the file in the DocJacket UI. Tell them:
 
 > _"Upload it in DocJacket → Documents → 412 Oak St. I'll create a task to track that — okay?"_
 

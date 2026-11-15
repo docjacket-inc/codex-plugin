@@ -94,7 +94,7 @@ The `execution-workflow` skill handles the action layer. Use:
 | Create a task to follow up later | `create_tasks` |
 | Save a status recap on the deal | `save_status_summary` |
 
-**Filing the actual attachment** is not yet automated — DocJacket doesn't have an `upload_document` tool. Tell the TC: _"I'd file the inspection report to the Smith deal, but file-on-approval isn't available yet — upload it manually in DocJacket → Documents → Smith."_ A `create_tasks` call can capture the upload as a reminder.
+**Filing the actual attachment** is not automated: no MCP tool files a document onto a deal (`create_upload_link` is only for a contract going through extraction). Tell the TC: _"I'd file the inspection report to the Smith deal, but file-on-approval isn't available yet — upload it manually in DocJacket → Documents → Smith."_ A `create_tasks` call can capture the upload as a reminder.
 
 ## Presentation rules
 

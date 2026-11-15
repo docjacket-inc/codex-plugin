@@ -11,7 +11,7 @@ metadata:
   docjacket-title: "Run a pre-closing checklist for a transaction and surface what's missing or at risk"
   docjacket-tools: "get_transaction get_key_dates get_missing_documents get_checklist_status list_open_contingencies get_open_tasks find_contact_by_email send_document_request send_agent_followup create_tasks"
   docjacket-scopes: "read draft"
-  docjacket-version: "1.0.0"
+  docjacket-version: "1.1.0"
 ---
 
 # Closing Preparation
@@ -90,6 +90,10 @@ On user yes, call:
 - **`create_tasks`** for items the TC wants to track but not chase yet
 
 Per `execution-workflow`, **one confirmation can authorize multiple bundled calls** — but only if the user saw every draft and clearly said yes to the bundle. If unclear, confirm each. Each email still gets its own preview and its own `confirm_email_send` call; an email that comes back `parked_for_review` is waiting for approval in DocJacket, not sent.
+
+## Compliance and signatures
+
+If the brokerage files deals in a compliance system (Dotloop, SkySlope, KW Command), offer the `compliance-filing` skill before closing: it prepares the deal for that system and can check signed PDFs for blank signature, initials and date lines.
 
 ## State-specific awareness
 
