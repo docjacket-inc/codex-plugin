@@ -1,12 +1,12 @@
 ---
 name: workspace-setup
-description: "Sets up and maintains a DocJacket organization from chat: the setup checklist, client agents and their TC fees and coordinators, organization settings, contact roles, document categories, custom fields, email templates and starter packs, online form templates, and the plan and upgrade link. Every change is confirmed with the user first, and most can be undone for 7 days. Use when the TC asks what to set up next, wants to set up their agents or fees, change a setting, manage templates or forms, or asks about their plan, limits or upgrading."
+description: "Sets up and maintains a DocJacket organization from chat: the setup checklist, client agents and their TC fees and coordinators, organization settings, contact roles, document categories, custom fields, email templates and starter packs, online form templates, and the plan. Every change is confirmed with the user first, and most can be undone for 7 days. Use when the TC asks what to set up next, wants to set up their agents or fees, change a setting, manage templates or forms, or asks about their plan, limits or upgrading."
 license: MIT
 ---
 
 <!--
 docjacket-title: Set up and maintain the organization: agents, settings, templates, forms and plan
-docjacket-tools: get_setup_status propose_setup_from_evidence set_agent_defaults change_org_setting get_default_fees undo_setting_change get_contact_roles get_document_categories save_setup_item archive_setup_item get_custom_fields list_team_members list_email_templates get_email_template render_email_template get_merge_fields create_email_template save_email_template install_template_pack undo_template_change list_form_templates get_form_definition create_form_template clone_form_template add_form_template_fields get_plan get_checkout_link get_recent_support_history
+docjacket-tools: get_setup_status propose_setup_from_evidence set_agent_defaults change_org_setting get_default_fees undo_setting_change get_contact_roles get_document_categories save_setup_item archive_setup_item get_custom_fields list_team_members list_email_templates get_email_template render_email_template get_merge_fields create_email_template save_email_template install_template_pack undo_template_change list_form_templates get_form_definition create_form_template clone_form_template add_form_template_fields get_plan get_recent_support_history
 docjacket-scopes: read actions
 docjacket-version: 1.0.0
 -->
@@ -70,8 +70,7 @@ Forms are created as drafts; a person publishes them in the form builder. Report
 
 ## Plan, limits and upgrading
 
-- **`get_plan`** (no arguments): plan name, paid or not, subscription status, limit and current use for deals, seats and AI extractions, who can subscribe, the billing page and the plans available with prices. Use it when a limit stopped the user.
-- **`get_checkout_link`** with the `plan_key` from `get_plan` returns a Stripe checkout link for an owner or admin. Show the link; never open it or pay yourself. Nothing is charged until they pay on Stripe's page. A member who isn't an owner or admin gets the names of who can subscribe. Changing or cancelling an existing subscription happens on the billing page.
+- **`get_plan`** (no arguments): plan name, paid or not, subscription status, and current use against limits for deals, seats and AI extractions. Use it when a limit stopped the user. If a feature needs another plan, tell the user an Owner or Admin can review plans at https://www.docjacket.com/pricing. Do not send a checkout, billing, or upgrade link.
 - MCP access is included with every DocJacket plan. On Free it is limited to 50 MCP calls per month, with limited data extractions.
 
 ## Support history
@@ -96,5 +95,5 @@ Forms are created as drafts; a person publishes them in the form builder. Report
 | `create_email_template` / `save_email_template` / `install_template_pack` / `undo_template_change` | Actions | Change templates; 7-day undo |
 | `list_form_templates` / `get_form_definition` | Read | Find a form and its fields |
 | `create_form_template` / `clone_form_template` / `add_form_template_fields` | Actions | Build or extend a form (draft) |
-| `get_plan` / `get_checkout_link` | Read | Plan, limits, upgrade link |
+| `get_plan` | Read | Plan and limits; for plan options, point to https://www.docjacket.com/pricing |
 | `get_recent_support_history` | Read | Recent support questions and open bugs |

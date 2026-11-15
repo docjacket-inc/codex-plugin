@@ -5,7 +5,7 @@
 # DocJacket — Transaction Coordination plugin for Codex
 
 [![Plugin](https://img.shields.io/badge/Codex-plugin-purple)]()
-[![Version](https://img.shields.io/badge/version-0.9.1-green)]()
+[![Version](https://img.shields.io/badge/version-0.9.2-green)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
 
 Connect DocJacket transactions, tasks, deadlines, contacts, and document checklists to OpenAI Codex. Triage your pipeline, draft and send follow-up emails from your connected Gmail, classify inbound attachments against the right deal — all from inside Codex.
@@ -38,7 +38,7 @@ Selected highlights — for the **live and complete** list with per-tool gotchas
 
 **Playbooks**: `start_playbook_draft`, `get_draft`, `add_tasks`, `copy_tasks`, `validate_draft`, `commit_playbook_draft` and the other draft tools.
 
-**Workspace setup**: `get_setup_status`, `set_agent_defaults`, `change_org_setting`, `save_email_template`, `install_template_pack`, `create_form_template`, `get_plan`, `get_checkout_link`.
+**Workspace setup**: `get_setup_status`, `set_agent_defaults`, `change_org_setting`, `save_email_template`, `install_template_pack`, `create_form_template`, `get_plan`.
 
 **Compliance**: `get_compliance_system`, `prepare_compliance_handoff`, `review_signatures`, `get_signature_review`, `send_compliance_documents`.
 
@@ -99,6 +99,8 @@ See [`CONNECTORS.md`](CONNECTORS.md) — Gmail / Calendar / Drive / Slack compos
 This plugin does NOT provide legal advice. See [`DISCLAIMER.md`](DISCLAIMER.md) for the full scope and limitations.
 
 ## Version
+
+`0.9.2` (2026-11-15) — OpenAI directory listing metadata: Business & Operations category, listing description and starter prompts, review test cases, and United States availability. `developerName` is Casey Spaulding (individual verification). Adds the Codex `.mcp.json` manifest (OAuth DCR, no custom headers) alongside `mcp.json`.
 
 `0.9.1` (2026-11-15) — Skill frontmatter is plain `key: value` lines (skill metadata moves to a comment under the frontmatter), shared with the Claude plugin's directory-policy release. `dj-cli` no longer shows a download-and-run install command, and `contract-intake` describes the sandbox upload without a shell upload command and points to the upload link first. Skills follow the current tool names: `get_open_tasks` (read its `summary` for the task counts) and `search_contacts` with `contactId` for one contact in full, instead of two names `tools/list` now hides.
 

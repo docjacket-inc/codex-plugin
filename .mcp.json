@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "docjacket": {
+      "url": "https://mcp.docjacket.com/mcp",
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "oauth",
+            "client": {
+              "mode": "dcr"
+            },
+            "baseScopes": [
+              "read",
+              "draft",
+              "actions"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
