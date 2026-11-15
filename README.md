@@ -100,7 +100,7 @@ This plugin does NOT provide legal advice. See [`DISCLAIMER.md`](DISCLAIMER.md) 
 
 ## Version
 
-`0.9.1` (2026-11-15) — Skill frontmatter is plain `key: value` lines (skill metadata moves to a comment under the frontmatter), shared with the Claude plugin's directory-policy release. `dj-cli` no longer shows a download-and-run install command, and `contract-intake` describes the sandbox upload without a shell upload command and points to the upload link first. Skills follow the current tool names: `get_open_tasks` (with its `summary` counts) instead of `get_checklist_status`, and `search_contacts` with `contactId` instead of `get_contact`.
+`0.9.1` (2026-11-15) — Skill frontmatter is plain `key: value` lines (skill metadata moves to a comment under the frontmatter), shared with the Claude plugin's directory-policy release. `dj-cli` no longer shows a download-and-run install command, and `contract-intake` describes the sandbox upload without a shell upload command and points to the upload link first. Skills follow the current tool names: `get_open_tasks` (read its `summary` for the task counts) and `search_contacts` with `contactId` for one contact in full, instead of two names `tools/list` now hides.
 
 `0.9.0` (2026-11-15) — Catches up with the current DocJacket MCP server: four new skills (`deal-updates`, `playbook-builder`, `workspace-setup`, `compliance-filing`) cover changing live deals, building Playbooks, organization setup and compliance filing; `contract-intake` adds the upload-link path (`create_upload_link`); skills use the current tool names (`review_deal_health`, `prepare_compliance_handoff`, `get_transaction_context`); stale "no upload tool" and connector text fixed.
 
