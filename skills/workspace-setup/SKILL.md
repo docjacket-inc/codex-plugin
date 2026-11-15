@@ -76,7 +76,7 @@ Forms are created as drafts; a person publishes them in the form builder. Report
 
 - **`get_plan`** (no arguments): plan name, paid or not, subscription status, limit and current use for deals, seats and AI extractions, who can subscribe, the billing page and the plans available with prices. Use it when a limit stopped the user.
 - **`get_checkout_link`** with the `plan_key` from `get_plan` returns a Stripe checkout link for an owner or admin. Show the link; never open it or pay yourself. Nothing is charged until they pay on Stripe's page. A member who isn't an owner or admin gets the names of who can subscribe. Changing or cancelling an existing subscription happens on the billing page.
-- MCP access is included with every DocJacket plan. On Free it is limited to 100 MCP calls per month, with limited data extractions.
+- MCP access is included with every DocJacket plan. On Free it is limited to 50 MCP calls per month, with limited data extractions.
 
 ## Support history
 
